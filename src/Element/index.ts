@@ -302,11 +302,14 @@ export class _Element_LocalDrag {
 }
 
 /** 获取元素 */
-function GetElement(element?: HTMLElement | string): HTMLElement {
+function GetElement(element?: HTMLElement | string) {
   if (typeof element === "string") {
     const dom = document.querySelector(element) as HTMLElement;
-    if (!dom) throw new Error(`Element "${element}" not found`);
-    return dom;
+    if (dom) {
+      return dom;
+    } else {
+      console.error(`Element "${element}" not found`);
+    }
   } else {
     return element || document.documentElement;
   }
@@ -316,6 +319,8 @@ export function _Element_EnterFullscreen(
   element?: HTMLElement | string
 ): Promise<void> {
   const ts_element = GetElement(element) as any;
+
+  if (!ts_element) return Promise.reject("No Element");
 
   if (ts_element.requestFullscreen) {
     return ts_element.requestFullscreen();
@@ -374,6 +379,7 @@ export function _Element_IsFullscreen(element?: HTMLElement | string) {
  */
 export function _Element_Fullscreen(element?: HTMLElement | string) {
   element = GetElement(element);
+  if (!element) return;
   return function () {
     if (_Element_IsFullscreen(element)) _Element_ExitFullscreen();
     else _Element_EnterFullscreen(element);
@@ -391,6 +397,8 @@ export function _Element_FullscreenObserver(
   selectors?: HTMLElement | string
 ) {
   const element = GetElement(selectors);
+
+  if (!element) return;
 
   // 使用全屏事件监听而非ResizeObserver，更准确
   const handleChange = () => {

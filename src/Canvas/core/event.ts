@@ -287,9 +287,15 @@ export default class Event extends Draw {
   private handleDragMove(event: MouseEvent) {
     if (!this.isDraggable) return;
 
-    const { lastDownOverlay } = this;
+    const { clientX, clientY } = event;
+    const mouseLastPosition = { x: clientX, y: clientY };
+    if (
+      JSON.stringify(mouseLastPosition) ==
+      JSON.stringify(this.mouseLastPosition)
+    )
+      return;
 
-    if (!this.isDraggable) return;
+    const { lastDownOverlay } = this;
 
     if (lastDownOverlay?.isDraggable) {
       this.notifyDraggOverlays(event);
@@ -297,8 +303,7 @@ export default class Event extends Draw {
       this.handleCanvasPan(event);
     }
 
-    const { clientX, clientY } = event;
-    this.mouseLastPosition = { x: clientX, y: clientY };
+    this.mouseLastPosition = mouseLastPosition;
     this.lockNotifyClick = true;
   }
   /** 通知可拖拽的 overlays */
