@@ -285,7 +285,7 @@ type UnitName = (typeof UnitConfigs)[number][0];
 
 /**
  * 格式化毫秒数为易读的时间单位（基于固定换算规则）
- * @param ms 待格式化的毫秒数（需为非负整数）
+ * @param ms 待格式化的毫秒数（需为非负数）
  * @param maxUnit 最大单位限制（可选，如传入"天"则最大只显示到天，不显示年/月/周）
  *                可选值："年"|"月"|"周"|"天"|"时"|"分"|"秒"|"毫秒"
  * @returns 格式化后的时间字符串（如 1.3秒、300毫秒、1,234年）
@@ -298,11 +298,13 @@ type UnitName = (typeof UnitConfigs)[number][0];
  *     - 自动匹配不超过最大单位限制的最优单位（数值≥单位阈值时使用该单位）
  *     - 非整数数值保留1位小数（如1.3秒），整数自动去除末尾.0（如1秒而非1.0秒）
  *     - "年"单位数值会自动应用千分位格式化（如1,234年）
- *  3. 输入校验：非整数或负数会返回"0毫秒"
+ *  3. 输入校验：负数会返回"0毫秒"
  */
 export function _Format_MillisecondToReadable(ms: number, maxUnit?: UnitName) {
-  // 校验输入：若为非整数或负数，返回0毫秒
-  if (!Number.isInteger(ms) || ms < 0) return "0毫秒";
+  // 校验输入：若为负数，返回0毫秒
+  if (!Number.isFinite(ms) || ms < 0) return "0毫秒";
+
+  ms = Math.round(ms);
 
   // 找到最大单位的索引（无限制时为0，有则取对应单位索引）
   const maxIndex = maxUnit
