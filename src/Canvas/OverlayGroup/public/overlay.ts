@@ -22,7 +22,7 @@ type ConstructorOption<T, V> = ConstructorParameters<
   /** 动态点位 */
   dynamicPosition?: V;
   /** 坐标轴上的值 */
-  value?: V;
+  value: V;
   /** 偏移 */
   offset?: { x: number; y: number };
   /** 鼠标移入时是否重新绘制 */
