@@ -42,13 +42,8 @@ export default class Axis {
     const newState = (() => {
       // 对象配置：未传的属性用默认值 true
       if (typeof show === "object") {
-        const {
-          all = true,
-          grid = { main: true, secondary: true },
-          axis = true,
-          axisText = true,
-        } = show;
-        Object.assign({ main: true, secondary: true }, grid);
+        const { all = true, grid = {}, axis = true, axisText = true } = show;
+        Object.assign(grid, { main: true, secondary: true });
         return { all, grid, axis, axisText };
       }
       // 布尔配置：全部属性同步开关
@@ -249,7 +244,7 @@ export default class Axis {
         this.drawText(
           "0",
           center.x - w - textOffset,
-          center.y + textSize + textOffset
+          center.y + textSize + textOffset,
         );
       }
     }
@@ -269,8 +264,8 @@ export default class Axis {
         center.x > 0
           ? center.x % grid_size
           : center.x < 0
-          ? grid_size + (center.x % grid_size)
-          : 0;
+            ? grid_size + (center.x % grid_size)
+            : 0;
 
       /** 起始值 */
       let v = canvas.getAxisValueByPoint((x - center.x) * axisConfig.x, 0).xV;
@@ -292,8 +287,8 @@ export default class Axis {
         center.y > 0
           ? center.y % grid_size
           : center.y < 0
-          ? grid_size + (center.y % grid_size)
-          : 0;
+            ? grid_size + (center.y % grid_size)
+            : 0;
 
       /** 起始值 */
       let v = canvas.getAxisValueByPoint(0, (y - center.y) * axisConfig.y).yV;
