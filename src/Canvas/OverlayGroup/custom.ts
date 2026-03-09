@@ -48,10 +48,10 @@ export default class Custom<T> extends Overlay<T, [number, number][]> {
   }
   private convertValuesToPositions(values: any[]): [number, number][] {
     const positions: [number, number][] = [];
-    let scale = 1;
+    let scale: number | undefined = undefined;
 
-    values.forEach((item, i) => {
-      if (i === 0) {
+    values.forEach((item) => {
+      if (scale === undefined) {
         const loc = this.mainCanvas!.getAxisPointByValue(
           item[0],
           item[1],
@@ -59,7 +59,9 @@ export default class Custom<T> extends Overlay<T, [number, number][]> {
         );
         positions.push([loc.x, loc.y]);
         // scale = this.mainCanvas!.preservePrecision(loc.x / item[0]);
-        scale = new Decimal(loc.x).div(item[0]).toNumber();
+        if (item[0] != 0) scale = new Decimal(loc.x).div(item[0]).toNumber();
+        else if (item[1] != 0)
+          scale = new Decimal(loc.y).div(item[1]).toNumber();
       } else {
         positions.push([
           // this.mainCanvas!.preservePrecision(scale * item[0]),
@@ -74,10 +76,10 @@ export default class Custom<T> extends Overlay<T, [number, number][]> {
   }
   private convertPositionsToValues(positions: [number, number][]): any[] {
     const values: any[] = [];
-    let scale = 1;
+    let scale: number | undefined = undefined;
 
     positions.forEach((item, i) => {
-      if (i === 0) {
+      if (scale === undefined) {
         const val = this.mainCanvas!.getAxisValueByPoint(
           item[0],
           item[1],
@@ -85,7 +87,9 @@ export default class Custom<T> extends Overlay<T, [number, number][]> {
         );
         values.push([val.xV, val.yV]);
         // scale = this.mainCanvas!.preservePrecision(val.xV / item[0]);
-        scale = new Decimal(val.xV).div(item[0]).toNumber();
+        if (item[0] != 0) scale = new Decimal(val.xV).div(item[0]).toNumber();
+        else if (item[1] != 0)
+          scale = new Decimal(val.yV).div(item[1]).toNumber();
       } else {
         values.push([
           // this.mainCanvas!.preservePrecision(scale * item[0]),
