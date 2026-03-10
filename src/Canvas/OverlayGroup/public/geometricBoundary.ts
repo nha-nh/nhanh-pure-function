@@ -104,7 +104,7 @@ export default abstract class GeometricBoundary<T> extends Overlay<
 
         if (canEditPoints) {
           const hoverPointIndex = this.handlePoints.findIndex(
-            (point) => point.isHover
+            (point) => point.isHover,
           );
 
           if (hoverPointIndex === -1) {
@@ -161,15 +161,15 @@ export default abstract class GeometricBoundary<T> extends Overlay<
   private createNewHandlePoint(prevIndex: number, nextIndex: number): Point {
     const midpointValue = getMidpoint(
       this.value![prevIndex],
-      this.value![nextIndex]
+      this.value![nextIndex],
     );
     const midpointPosition = getMidpoint(
       this.position![prevIndex],
-      this.position![nextIndex]
+      this.position![nextIndex],
     );
     const midpointDynamic = getMidpoint(
       this.dynamicPosition![prevIndex],
-      this.dynamicPosition![nextIndex]
+      this.dynamicPosition![nextIndex],
     );
 
     return new Point({
@@ -245,7 +245,7 @@ export default abstract class GeometricBoundary<T> extends Overlay<
     };
     if (this.isHandlePointsVisible) {
       const hover_point_index = this.handlePoints.findIndex(
-        (point) => point.isHover
+        (point) => point.isHover,
       );
       if (hover_point_index != -1) {
         const point = this.handlePoints[hover_point_index];
@@ -269,6 +269,7 @@ export default abstract class GeometricBoundary<T> extends Overlay<
     value?.forEach((_, index) => {
       if (!this.handlePoints[index]) {
         const point = new Point({
+          value: [0, 0],
           mainCanvas: this.mainCanvas,
           isDraggable: true,
           offset,
@@ -283,7 +284,7 @@ export default abstract class GeometricBoundary<T> extends Overlay<
           position: position![index],
           dynamicPosition: dynamicPosition![index],
         },
-        true
+        true,
       );
     });
     this.handlePoints.length = value!.length;
@@ -307,7 +308,7 @@ export default abstract class GeometricBoundary<T> extends Overlay<
 function findInsertIndex(
   clickPosition: PointLocation,
   controlPoints: PointLocation[],
-  threshold: number = 10 // 可配置的阈值
+  threshold: number = 10, // 可配置的阈值
 ): number {
   if (controlPoints.length === 0) return 0;
   if (controlPoints.length === 1) return 1;
@@ -319,7 +320,7 @@ function findInsertIndex(
     const distance = _Math_PointToLineDistance(
       clickPosition,
       controlPoints[i],
-      controlPoints[i + 1]
+      controlPoints[i + 1],
     );
 
     // 如果找到足够近的点，可以提前返回
@@ -347,7 +348,7 @@ function findInsertIndex(
  */
 function getMidpoint(
   value1: [number, number],
-  value2: [number, number]
+  value2: [number, number],
 ): [number, number] {
   // 调用 _Math_GetMidpoint 函数计算中点，并将结果解构为 x 和 y
   const { x, y } = _Math_GetMidpoint(...value1, ...value2);

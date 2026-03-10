@@ -32,7 +32,7 @@ export default class ArcTo extends Overlay<ArcToStyleType, [number, number][]> {
       return ([radius, ...other].filter(Boolean) as Point[]).sort(
         (a, b) =>
           (a.isHover || a == radius ? 0 : 1) -
-          (b.isHover || b == radius ? 0 : 1)
+          (b.isHover || b == radius ? 0 : 1),
       );
     }
     return [];
@@ -202,7 +202,7 @@ export default class ArcTo extends Overlay<ArcToStyleType, [number, number][]> {
     } else if (typeof this.style == "object") {
       style = _Utility_MergeObjects(
         JSON.parse(JSON.stringify(defaultStyle)),
-        this.style
+        this.style,
       );
     } else {
       style = defaultStyle;
@@ -223,6 +223,7 @@ export default class ArcTo extends Overlay<ArcToStyleType, [number, number][]> {
 
     const getPoint = () =>
       new Point({
+        value: [0, 0],
         mainCanvas: this.mainCanvas,
         isDraggable: true,
         notifyReload: () => this.notifyReload?.(),
@@ -238,7 +239,7 @@ export default class ArcTo extends Overlay<ArcToStyleType, [number, number][]> {
           position: position![index],
           dynamicPosition: dynamicPosition![index],
         },
-        true
+        true,
       );
     });
     other.length = value!.length;
