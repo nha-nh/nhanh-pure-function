@@ -42,8 +42,8 @@ export default class Axis {
     const newState = (() => {
       // 对象配置：未传的属性用默认值 true
       if (typeof show === "object") {
-        const { all = true, grid = {}, axis = true, axisText = true } = show;
-        Object.assign(grid, { main: true, secondary: true });
+        const { all = true, axis = true, axisText = true } = show;
+        const grid = Object.assign({ main: true, secondary: true }, show.grid);
         return { all, grid, axis, axisText };
       }
       // 布尔配置：全部属性同步开关

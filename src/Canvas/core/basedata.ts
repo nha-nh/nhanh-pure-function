@@ -195,7 +195,7 @@ export default class BaseData extends EventController {
     const calculateCoordinate = (
       primary: string | number | undefined,
       secondary: string | number | undefined,
-      max: number
+      max: number,
     ) => {
       if (primary !== undefined) {
         const v = valueParsers.vertical(primary, max);
@@ -240,7 +240,7 @@ export default class BaseData extends EventController {
   /** 设置缩放 */
   setScale(
     event: "center" | { clientX: number; clientY: number },
-    delta: number
+    delta: number,
   ) {
     const { canvas, isWheelable, axisConfig, rect } = this;
 
@@ -265,7 +265,7 @@ export default class BaseData extends EventController {
 
     const newMousePoint = this.getAxisPointByValue(
       mouseValue.xV,
-      mouseValue.yV
+      mouseValue.yV,
     );
 
     this.offset.x -= (newMousePoint.x - mousePoint.x) * axisConfig.x;
@@ -278,7 +278,7 @@ export default class BaseData extends EventController {
     // 1. 合并配置并转换为数值类型
     const mergedConfig = { ...this.axisConfig, ...config };
     const numericConfig = Object.fromEntries(
-      Object.entries(mergedConfig).map(([key, value]) => [key, Number(value)])
+      Object.entries(mergedConfig).map(([key, value]) => [key, Number(value)]),
     ) as typeof this.axisConfig;
 
     // 2. 解构需要验证的字段
@@ -292,22 +292,17 @@ export default class BaseData extends EventController {
     const isValidSize = size >= min && size <= min * 2;
 
     // 4. 条件组合与提前返回
-    if (
-      !isValidX ||
-      !isValidY ||
-      !isValidCount ||
-      !isValidRange ||
-      !isValidSize
-    ) {
+    if (!isValidX || !isValidY || !isValidCount || !isValidRange) {
       console.warn("Invalid axis configuration:", {
         x,
         y,
         count,
         min,
-        size,
       });
       return;
     }
+
+    if (!isValidSize) numericConfig.size = min;
 
     // 5. 通过所有验证后更新配置
     this.axisConfig = numericConfig;
@@ -438,7 +433,7 @@ export default class BaseData extends EventController {
   getAxisPointByValue(
     xV: number,
     yV: number,
-    returnInitialScaleValue?: boolean
+    returnInitialScaleValue?: boolean,
   ) {
     const { axisConfig } = this;
 
@@ -505,7 +500,7 @@ export default class BaseData extends EventController {
 
     if (Array.isArray(positions[0])) {
       return (positions as [number, number][]).map((position) =>
-        transform(position)
+        transform(position),
       );
     }
 

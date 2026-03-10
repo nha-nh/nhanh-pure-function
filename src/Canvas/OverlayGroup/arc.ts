@@ -221,7 +221,7 @@ export default class Arc extends Overlay<ArcStyleType, [number, number]> {
               _Number.add(item.dynamicPosition![1], y.dynamicPosition),
             ],
           },
-          true
+          true,
         );
       });
       this.notifyReload?.();
@@ -314,7 +314,7 @@ export default class Arc extends Overlay<ArcStyleType, [number, number]> {
     } else if (typeof this.style == "object") {
       style = _Utility_MergeObjects(
         JSON.parse(JSON.stringify(defaultStyle)),
-        this.style
+        this.style,
       );
     } else {
       style = defaultStyle;
@@ -345,7 +345,7 @@ export default class Arc extends Overlay<ArcStyleType, [number, number]> {
     return (Object.values(this.handlePoints).filter(Boolean) as Point[]).sort(
       (a, b) =>
         (a.isHover || a == radiusPoint ? 0 : 1) -
-        (b.isHover || b == radiusPoint ? 0 : 1)
+        (b.isHover || b == radiusPoint ? 0 : 1),
     );
   }
   /** 更新控制点 */
@@ -369,13 +369,14 @@ export default class Arc extends Overlay<ArcStyleType, [number, number]> {
       startAngle,
       endAngle,
       mainCanvas.axisConfig.x,
-      mainCanvas.axisConfig.y
+      mainCanvas.axisConfig.y,
     );
 
     const getPoint = (name: string) =>
       new Point({
         name,
         offset,
+        value: [0, 0],
         isDraggable: true,
         mainCanvas: this.mainCanvas,
         notifyReload: () => this.notifyReload?.(),
@@ -403,13 +404,13 @@ export default class Arc extends Overlay<ArcStyleType, [number, number]> {
       this._radiusPosition = this.mainCanvas.getAxisPointByValue(
         this.radiusValue,
         0,
-        true
+        true,
       ).x;
     else
       this._radiusValue = this.mainCanvas.getAxisValueByPoint(
         this.radiusPosition,
         0,
-        true
+        true,
       ).xV;
 
     if (!this.handleValuePosition("array1D")) return;
@@ -422,7 +423,7 @@ export default class Arc extends Overlay<ArcStyleType, [number, number]> {
     ctx: CanvasRenderingContext2D,
     x: number,
     y: number,
-    style: ArcStyleType
+    style: ArcStyleType,
   ) {
     this.setBaseLineStyle(ctx, { ...style.stroke, dash: !style.stroke.dash });
 
@@ -440,7 +441,7 @@ export default class Arc extends Overlay<ArcStyleType, [number, number]> {
       radiusPosition * mainCanvas!.percentage,
       endAngle,
       startAngle,
-      counterclockwise
+      counterclockwise,
     );
     ctx.stroke();
 
@@ -484,7 +485,7 @@ export default class Arc extends Overlay<ArcStyleType, [number, number]> {
       radiusPosition * mainCanvas.percentage,
       startAngle,
       endAngle,
-      counterclockwise
+      counterclockwise,
     );
     if (isClosed) {
       this.path.lineTo(x, y);
@@ -550,7 +551,7 @@ function _GetArcPoints(
   startAngle: number,
   endAngle: number,
   axisX: number = 1,
-  axisY: number = 1
+  axisY: number = 1,
 ): [[number, number], [number, number]] {
   // 计算起点坐标（考虑坐标轴方向）
   const startX = x + radius * Math.cos(startAngle) * axisX;
