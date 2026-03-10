@@ -22,7 +22,7 @@ type ConstructorOption<T, V> = ConstructorParameters<
   /** 动态点位 */
   dynamicPosition?: V;
   /** 坐标轴上的值 */
-  value: V;
+  value?: V;
   /** 偏移 */
   offset?: { x: number; y: number };
   /** 鼠标移入时是否重新绘制 */
@@ -31,7 +31,7 @@ type ConstructorOption<T, V> = ConstructorParameters<
 
 export default abstract class Overlay<
   T,
-  V extends [number, number] | [number, number][]
+  V extends [number, number] | [number, number][],
 > extends EventController {
   static ctx = document.createElement("canvas").getContext("2d")!;
 
@@ -170,7 +170,7 @@ export default abstract class Overlay<
       zIndex?: number;
       style?: _Type_DeepPartial<T> | string;
     },
-    updateValueScope?: boolean
+    updateValueScope?: boolean,
   ) {
     Object.keys(option).forEach((key) => {
       const privateKey = this.publicToPrivateKeyMap[key as never];
@@ -225,7 +225,7 @@ export default abstract class Overlay<
           minY: number;
           maxY: number;
         }
-      | undefined
+      | undefined,
   ) {
     this._valueScope = value;
   }
@@ -358,7 +358,7 @@ export default abstract class Overlay<
           leftV: number;
           rightV: number;
         }
-      | true
+      | true,
   ) {
     if (value === true) {
       this.fixedExtraScope = { topV: 0, bottomV: 0, leftV: 0, rightV: 0 };
@@ -412,7 +412,7 @@ export default abstract class Overlay<
           left: number;
           right: number;
         }
-      | true
+      | true,
   ) {
     const { valueScope, mainCanvas, extraScope } = this;
     if (!valueScope || !mainCanvas) return;
@@ -433,11 +433,11 @@ export default abstract class Overlay<
 
       const { xV: topV, yV: bottomV } = mainCanvas.getAxisValueByPoint(
         top,
-        bottom
+        bottom,
       );
       const { xV: leftV, yV: rightV } = mainCanvas.getAxisValueByPoint(
         left,
-        right
+        right,
       );
 
       valueScope.minX -= leftV - extraScope.leftV;
@@ -579,7 +579,7 @@ export default abstract class Overlay<
   /** 绘制线基础样式 */
   protected setBaseLineStyle(
     ctx: CanvasRenderingContext2D,
-    style: BaseLineStyle
+    style: BaseLineStyle,
   ) {
     const { width, dash, dashGap, dashOffset, color, color_hover, cap, join } =
       style;

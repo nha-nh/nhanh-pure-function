@@ -33,18 +33,17 @@ export default class Custom<T> extends Overlay<T, [number, number][]> {
   protected updateBaseData() {
     if (!this.mainCanvas) return;
 
-    this.internalUpdate({ dynamicPosition: undefined });
+    this.internalUpdate({ dynamicPosition: [] });
 
-    let value = this.value as any;
-    let position = this.position as any;
-
+    let value = this.value;
+    let position = this.position;
     if (value) {
       position = this.convertValuesToPositions(value);
-    } else {
-      value = this.convertPositionsToValues(position!);
+    } else if (position) {
+      value = this.convertPositionsToValues(position);
     }
 
-    this.updateDataProperties(value, position);
+    if (value && position) this.updateDataProperties(value, position);
   }
   private convertValuesToPositions(values: any[]): [number, number][] {
     const positions: [number, number][] = [];
@@ -55,7 +54,7 @@ export default class Custom<T> extends Overlay<T, [number, number][]> {
         const loc = this.mainCanvas!.getAxisPointByValue(
           item[0],
           item[1],
-          true
+          true,
         );
         positions.push([loc.x, loc.y]);
         // scale = this.mainCanvas!.preservePrecision(loc.x / item[0]);
@@ -83,7 +82,7 @@ export default class Custom<T> extends Overlay<T, [number, number][]> {
         const val = this.mainCanvas!.getAxisValueByPoint(
           item[0],
           item[1],
-          true
+          true,
         );
         values.push([val.xV, val.yV]);
         // scale = this.mainCanvas!.preservePrecision(val.xV / item[0]);
@@ -129,9 +128,9 @@ export default class Custom<T> extends Overlay<T, [number, number][]> {
   getDraw(): [(ctx: CanvasRenderingContext2D) => void, OverlayType] | void {
     if (this.isNeedRender) {
       const { mainCanvas, position } = this;
-      if (this.isRecalculate) {
+      if (this.isRecalculate && position) {
         this.internalUpdate({
-          dynamicPosition: mainCanvas!.transformPosition(position!),
+          dynamicPosition: mainCanvas!.transformPosition(position),
         });
       }
       return [this.draw, this];
