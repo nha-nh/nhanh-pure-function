@@ -2,7 +2,10 @@ import _Canvas from "..";
 import OverlayGroup, { type OverlayType } from "../OverlayGroup";
 import EventController from "../public/eventController";
 
-type ConstructorOption = ConstructorParameters<typeof EventController>[0];
+type ConstructorOption = ConstructorParameters<typeof EventController>[0] & {
+  /** 层级 */
+  zIndex?: number;
+};
 
 /**
  * 图层事件触发机制说明：
@@ -18,8 +21,17 @@ type ConstructorOption = ConstructorParameters<typeof EventController>[0];
  */
 
 export default class Layer extends EventController {
+  private _zIndex = 4;
   /** 层级 */
-  zIndex = 4;
+  get zIndex() {
+    return this._zIndex;
+  }
+  set zIndex(zIndex: number) {
+    if (this._zIndex != zIndex) {
+      this._zIndex = zIndex;
+      this.notifyReload?.();
+    }
+  }
 
   protected canvas = document.createElement("canvas");
   protected ctx = this.canvas.getContext("2d")!;
@@ -31,6 +43,8 @@ export default class Layer extends EventController {
   constructor(option: ConstructorOption) {
     super(option);
     this.setNotifyReload(option.notifyReload);
+
+    if (typeof option.zIndex == "number") this.zIndex = option.zIndex;
   }
 
   setMainCanvas(mainCanvas?: _Canvas) {
@@ -62,7 +76,7 @@ export default class Layer extends EventController {
             this.notifyReload?.();
             this.isReload = true;
           }
-        : undefined
+        : undefined,
     );
   }
 
@@ -108,14 +122,6 @@ export default class Layer extends EventController {
     }
   }
 
-  /** 设置图层的 zIndex 值 */
-  setzIndex(zIndex: number) {
-    if (zIndex != this.zIndex) {
-      this.zIndex = zIndex;
-      this.notifyReload?.(false);
-    }
-  }
-
   /** 本次绘制的覆盖物 */
   private currentDrawOverlays: [[number, number], OverlayType][] = [];
   /** 获取画布 */
@@ -138,7 +144,7 @@ export default class Layer extends EventController {
 
         const groupArr: [
           number,
-          [(ctx: CanvasRenderingContext2D) => void, OverlayType]
+          [(ctx: CanvasRenderingContext2D) => void, OverlayType],
         ][] = [];
         this.groups.forEach((group) => {
           if (group.equalsMainCanvas(this.mainCanvas))
