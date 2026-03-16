@@ -9,6 +9,7 @@ import type Axis from "./core/axis";
 import type Custom from "./OverlayGroup/custom";
 import type Arc from "./OverlayGroup/arc";
 import type ArcTo from "./OverlayGroup/arcTo";
+import type OverlayCreatorByAxisValue from "./OverlayCreator";
 import type { EventHandler } from "./public/eventController";
 import type Overlay from "./OverlayGroup/public/overlay";
 // import type  Ellipse from "./OverlayGroup/ellipse";
@@ -44,6 +45,7 @@ export type {
   Custom,
   Arc,
   ArcTo,
+  OverlayCreatorByAxisValue,
   // Ellipse,
   // BezierCurve,
   //#endregion

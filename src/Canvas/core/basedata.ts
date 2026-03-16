@@ -120,7 +120,7 @@ export default class BaseData extends EventController {
   drawAxis: Axis = undefined as any;
 
   /** 图层群组 集合 */
-  protected layerGroups = new Map<string, LayerGroup>();
+  layerGroups = new Map<string, LayerGroup>();
 
   constructor(option: ConstructorOption) {
     super(option);
