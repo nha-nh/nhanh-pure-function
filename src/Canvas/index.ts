@@ -13,6 +13,7 @@ import Custom from "./OverlayGroup/custom";
 import Arc from "./OverlayGroup/arc";
 import ArcTo from "./OverlayGroup/arcTo";
 import OverlayCreator from "./OverlayCreator";
+import ViewFit from "./public/viewFit";
 import { DeepArray } from "./common.type";
 // import Ellipse from "./OverlayGroup/ellipse";
 // import BezierCurve from "./OverlayGroup/bezierCurve";
@@ -36,6 +37,10 @@ function FlattenAll<T>(arr: any): T[] {
  *   - 动态图表(月牙定理): https://nha-nh.github.io/math/DynamicDiagram/%E6%9C%88%E7%89%99%E5%AE%9A%E7%90%86
  */
 export class _Canvas extends QuickMethod {
+  /** 视图适配工具：默认缩放、居中计算 */
+  static ViewFit = ViewFit;
+
+
   /** 图层群组 */
   static LayerGroup = LayerGroup;
   /** 图层 */
@@ -58,7 +63,7 @@ export class _Canvas extends QuickMethod {
   /** 圆角 */
   static ArcTo = ArcTo;
   /** 按坐标轴值创建覆盖物（多边形/线）的交互管理 */
-  overlayCreator: OverlayCreator
+  overlayCreator: OverlayCreator;
 
   constructor(option: ConstructorOption) {
     super(option);

@@ -1,6 +1,6 @@
 {
   "name": "nhanh-pure-function",
-  "version": "3.0.7",
+  "version": "3.0.8",
   "description": "纯函数工具",
   "main": "./dist/index.cjs.js",
   "module": "./dist/index.es.js",
@@ -39,10 +39,10 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ADMINnhanh/nhanh-pure-function.git"
+    "url": "git+https://github.com/nha-nh/nhanh-pure-function.git"
   },
   "bugs": {
-    "url": "https://github.com/ADMINnhanh/nhanh-pure-function/issues"
+    "url": "https://github.com/nha-nh/nhanh-pure-function/issues"
   },
-  "homepage": "https://github.com/ADMINnhanh/nhanh-pure-function#readme"
+  "homepage": "https://github.com/nha-nh/nhanh-pure-function#readme"
 }
