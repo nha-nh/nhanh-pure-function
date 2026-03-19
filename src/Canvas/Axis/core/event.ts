@@ -3,7 +3,7 @@ import {
   _Math_CalculateDistance2D,
   _Valid_IsNumberArray,
   _Math_GetMidpoint,
-} from "../..";
+} from "../../../../";
 import type { OverlayType } from "../OverlayGroup";
 import Draw from "./draw";
 import type { EventHandler } from "../public/eventController";
@@ -152,8 +152,8 @@ export default class Event extends Draw {
       (_Valid_Is2DNumberArray(overlay.value)
         ? "Matrix"
         : _Valid_IsNumberArray(overlay.value)
-        ? "Single"
-        : false);
+          ? "Single"
+          : false);
 
     // 方向键处理逻辑抽象
     const handleDirection = (dx: number, dy: number) => {

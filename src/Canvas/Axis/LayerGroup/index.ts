@@ -1,4 +1,4 @@
-import _Canvas from "..";
+import _Canvas_Axis from "..";
 import type { OverlayType } from "../OverlayGroup";
 import Layer from "./layer";
 import type { EventHandler } from "../public/eventController";
@@ -40,7 +40,7 @@ export default class LayerGroup extends EventController {
   defaultDown: EventHandler<"down"> = (event, mouseEvent) =>
     event.stopPropagation();
 
-  setMainCanvas(mainCanvas?: _Canvas) {
+  setMainCanvas(mainCanvas?: _Canvas_Axis) {
     super.setMainCanvas(mainCanvas);
     this.layers.forEach((layer) => {
       layer.setMainCanvas(mainCanvas);
@@ -51,12 +51,12 @@ export default class LayerGroup extends EventController {
   setNotifyReload(notifyReload?: () => void) {
     this.notifyReload = notifyReload
       ? (needForceExecute) => {
-          if (needForceExecute) this.isRecalculate = true;
+        if (needForceExecute) this.isRecalculate = true;
 
-          if (needForceExecute || (this.shouldRender() && this.layers.size)) {
-            notifyReload();
-          }
+        if (needForceExecute || (this.shouldRender() && this.layers.size)) {
+          notifyReload();
         }
+      }
       : undefined;
 
     this.layers.forEach((layer) => layer.setNotifyReload(this.notifyReload));

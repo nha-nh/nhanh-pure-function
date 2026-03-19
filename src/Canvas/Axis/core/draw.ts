@@ -1,6 +1,6 @@
-import { _Utility_Debounce, _Utility_TimeConsumption } from "../..";
+import { _Utility_Debounce, _Utility_TimeConsumption } from "../../../../";
 import Style from "./style";
-import _Canvas from "..";
+import _Canvas_Axis from "..";
 import type { OverlayType } from "../OverlayGroup";
 
 import Custom from "../OverlayGroup/custom";

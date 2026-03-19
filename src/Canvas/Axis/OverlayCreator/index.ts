@@ -1,4 +1,4 @@
-import _Canvas from "..";
+import _Canvas_Axis from "..";
 import Line from "../OverlayGroup/line";
 import Polygon from "../OverlayGroup/polygon";
 import type { EventHandler } from "../public/eventController";
@@ -9,15 +9,15 @@ import type { EventHandler } from "../public/eventController";
  */
 export default class OverlayCreator {
   /** 绑定的画布实例 */
-  private canvas: _Canvas;
-  private layerGroup = new _Canvas.LayerGroup({ name: "创建覆盖物图层群组" });
+  private canvas: _Canvas_Axis;
+  private layerGroup = new _Canvas_Axis.LayerGroup({ name: "创建覆盖物图层群组" });
   /** 创建中覆盖物的绘制层（置顶以保证可见） */
-  private overlayLayer = new _Canvas.Layer({
+  private overlayLayer = new _Canvas_Axis.Layer({
     name: "creator-layer",
     zIndex: 9999,
   });
   /** 该层内的覆盖物分组，便于统一增删 */
-  private overlayGroup = new _Canvas.OverlayGroup({ name: "creator-group" });
+  private overlayGroup = new _Canvas_Axis.OverlayGroup({ name: "creator-group" });
 
   /** 当前正在创建的覆盖物（多边形或线），其顶点通过 overlay.value 即坐标轴上的值表示 */
   private overlay?: Polygon | Line;
@@ -26,7 +26,7 @@ export default class OverlayCreator {
 
   /** 创建时暂存的其他图层群组的 isInteractive，编辑完成后用于复原 */
   private savedLayerGroupInteractive = new Map<
-    InstanceType<typeof _Canvas.LayerGroup>,
+    InstanceType<typeof _Canvas_Axis.LayerGroup>,
     boolean
   >();
 
@@ -35,7 +35,7 @@ export default class OverlayCreator {
    */
   axisValueLimiter?: (value: [number, number]) => [number, number];
 
-  constructor(canvas: _Canvas) {
+  constructor(canvas: _Canvas_Axis) {
     this.canvas = canvas;
 
     this.overlayLayer.addGroup(this.overlayGroup);
@@ -79,7 +79,7 @@ export default class OverlayCreator {
     this.disableOtherLayerGroups();
     if (this.overlay) this.overlayGroup.removeOverlays(this.overlay);
     this.axisValueList = [];
-    this.overlay = new _Canvas.Line({});
+    this.overlay = new _Canvas_Axis.Line({});
     this.overlayGroup.addOverlays(this.overlay);
     return this.overlay;
   }
@@ -87,7 +87,7 @@ export default class OverlayCreator {
     this.disableOtherLayerGroups();
     if (this.overlay) this.overlayGroup.removeOverlays(this.overlay);
     this.axisValueList = [];
-    this.overlay = new _Canvas.Polygon({});
+    this.overlay = new _Canvas_Axis.Polygon({});
     this.overlayGroup.addOverlays(this.overlay);
     return this.overlay;
   }
@@ -118,9 +118,9 @@ export default class OverlayCreator {
 
   /** 当前类型完成绘制所需的最少顶点数（多边形 3，线 2） */
   private get minPointCount() {
-    if (this.overlay instanceof _Canvas.Polygon) {
+    if (this.overlay instanceof _Canvas_Axis.Polygon) {
       return 3;
-    } else if (this.overlay instanceof _Canvas.Line) {
+    } else if (this.overlay instanceof _Canvas_Axis.Line) {
       return 2;
     } else {
       return 0;

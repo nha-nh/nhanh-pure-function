@@ -1,4 +1,4 @@
-import _Canvas from "..";
+import _Canvas_Axis from "..";
 import EventController from "../public/eventController";
 
 import Text from "./text";
@@ -31,7 +31,7 @@ export default class OverlayGroup extends EventController {
     this.setNotifyReload(option.notifyReload);
   }
   /** 设置主画布 */
-  setMainCanvas(mainCanvas?: _Canvas) {
+  setMainCanvas(mainCanvas?: _Canvas_Axis) {
     super.setMainCanvas(mainCanvas);
     this.overlays.forEach((overlay) => {
       overlay.setMainCanvas(mainCanvas);
@@ -43,11 +43,11 @@ export default class OverlayGroup extends EventController {
   setNotifyReload(notifyReload?: () => void) {
     this.notifyReload = notifyReload
       ? (needForceExecute?: boolean) => {
-          if (needForceExecute) this.isRecalculate = true;
-          if (needForceExecute || (this.shouldRender() && this.overlays.size)) {
-            notifyReload();
-          }
+        if (needForceExecute) this.isRecalculate = true;
+        if (needForceExecute || (this.shouldRender() && this.overlays.size)) {
+          notifyReload();
         }
+      }
       : undefined;
 
     this.overlays.forEach((overlay) =>

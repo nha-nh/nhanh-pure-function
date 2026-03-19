@@ -1,4 +1,4 @@
-import _Canvas from "..";
+import _Canvas_Axis from "..";
 import Overlay from "./public/overlay";
 import { type OverlayType } from "./index";
 import Decimal from "decimal.js";
@@ -109,7 +109,7 @@ export default class Custom<T> extends Overlay<T, [number, number][]> {
     });
   }
 
-  protected setOverlayStyles(ctx?: CanvasRenderingContext2D): any {}
+  protected setOverlayStyles(ctx?: CanvasRenderingContext2D): any { }
   protected get computedValueScopeStyles() {
     return {};
   }

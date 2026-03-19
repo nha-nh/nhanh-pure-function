@@ -2,7 +2,7 @@ import {
   _Type_DeepPartial,
   _Utility_Clone,
   _Utility_MergeObjects,
-} from "../..";
+} from "../../../../";
 import { KnownStyleKeys, StyleItemType, StyleType } from "../common.type";
 import BaseData from "./basedata";
 
@@ -231,9 +231,8 @@ export default class Style extends BaseData {
     canvas.classList.add("_nhanh_canvas");
 
     const style = this.style[theme];
-    ctx.font = `${style.text.bold ? "bold" : ""} ${style.text.size}px ${
-      style.text.family
-    }`;
+    ctx.font = `${style.text.bold ? "bold" : ""} ${style.text.size}px ${style.text.family
+      }`;
   }
   /** 清除画布 */
   clearScreen(fillBackground = true) {

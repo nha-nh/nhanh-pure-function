@@ -1,5 +1,5 @@
-import { _Utility_GenerateUUID } from "../..";
-import type _Canvas from "..";
+import { _Utility_GenerateUUID } from "../../../";
+import type _Canvas_Axis from "..";
 
 abstract class Base<T extends Base<T>> {
   /** 父级 */
@@ -12,7 +12,7 @@ abstract class Base<T extends Base<T>> {
   extData?: any;
 
   /** 主画布 */
-  mainCanvas?: _Canvas;
+  mainCanvas?: _Canvas_Axis;
 
   private _isRecalculate = false;
   /** 是否需要重新计算坐标 */
@@ -26,11 +26,11 @@ abstract class Base<T extends Base<T>> {
   }
 
   /** 是否是同一个主画布 */
-  equalsMainCanvas(mainCanvas?: _Canvas) {
+  equalsMainCanvas(mainCanvas?: _Canvas_Axis) {
     return this.mainCanvas === mainCanvas;
   }
   /** 设置主画布 */
-  setMainCanvas(mainCanvas?: _Canvas) {
+  setMainCanvas(mainCanvas?: _Canvas_Axis) {
     this.mainCanvas = mainCanvas;
   }
 
@@ -107,7 +107,7 @@ interface BaseDataOptions {
   /** 自定义扩展数据 */
   extData?: any;
   /** 主画布 */
-  mainCanvas?: _Canvas;
+  mainCanvas?: _Canvas_Axis;
   /** 通知重新加载 */
   notifyReload?: (needForceExecute?: boolean) => void;
 

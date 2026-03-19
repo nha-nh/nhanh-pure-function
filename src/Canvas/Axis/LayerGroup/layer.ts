@@ -1,4 +1,4 @@
-import _Canvas from "..";
+import _Canvas_Axis from "..";
 import OverlayGroup, { type OverlayType } from "../OverlayGroup";
 import EventController from "../public/eventController";
 
@@ -47,7 +47,7 @@ export default class Layer extends EventController {
     if (typeof option.zIndex == "number") this.zIndex = option.zIndex;
   }
 
-  setMainCanvas(mainCanvas?: _Canvas) {
+  setMainCanvas(mainCanvas?: _Canvas_Axis) {
     super.setMainCanvas(mainCanvas);
     this.canvas.width = mainCanvas?.rect.width || 0;
     this.canvas.height = mainCanvas?.rect.height || 0;
@@ -60,11 +60,11 @@ export default class Layer extends EventController {
   setNotifyReload(notifyReload?: () => void) {
     this.notifyReload = notifyReload
       ? (needForceExecute) => {
-          if (needForceExecute) this.isRecalculate = true;
-          if (needForceExecute || (this.shouldRender() && this.groups.size)) {
-            notifyReload();
-          }
+        if (needForceExecute) this.isRecalculate = true;
+        if (needForceExecute || (this.shouldRender() && this.groups.size)) {
+          notifyReload();
         }
+      }
       : undefined;
 
     this.groups.forEach((group) => this.setGroupNotifyReload(group));
@@ -73,9 +73,9 @@ export default class Layer extends EventController {
     group.setNotifyReload(
       this.notifyReload
         ? () => {
-            this.notifyReload?.();
-            this.isReload = true;
-          }
+          this.notifyReload?.();
+          this.isReload = true;
+        }
         : undefined,
     );
   }

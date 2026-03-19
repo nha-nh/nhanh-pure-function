@@ -1,5 +1,5 @@
-import { _Math_GetMidpoint, _Math_PointToLineDistance } from "../../..";
-import _Canvas from "..";
+import { _Math_GetMidpoint, _Math_PointToLineDistance } from "../../../../";
+import _Canvas_Axis from "..";
 import Overlay from "./overlay";
 import Point from "../point";
 import type { EventHandler } from "../../public/eventController";

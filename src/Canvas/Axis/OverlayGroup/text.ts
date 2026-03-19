@@ -1,8 +1,8 @@
-import _Canvas from "..";
+import _Canvas_Axis from "..";
 import Overlay from "./public/overlay";
 import { type OverlayType } from "./index";
 import type { EventHandler } from "../public/eventController";
-import { _Valid_IsNumberArray } from "../..";
+import { _Valid_IsNumberArray } from "../../../";
 import { _Number } from "../public/tools";
 import { TextStyleType } from "../common.type";
 

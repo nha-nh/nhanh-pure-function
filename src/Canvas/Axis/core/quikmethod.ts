@@ -1,4 +1,4 @@
-import { _Animate_Schedule, _Type_DeepPartial } from "../..";
+import { _Animate_Schedule, _Type_DeepPartial } from "../../../../";
 import Axis from "./axis";
 import Event from "./event";
 import OverlayGroup, { type OverlayType } from "../OverlayGroup";
@@ -258,7 +258,7 @@ class QuickMethod_View extends QuickMethod_Set {
         1 -
         ((requiredGridMaxValue / maxDensity - axisConfig.min) / axisConfig.min +
           (densityMultiplier - 2)) *
-          scaleStepFactor;
+        scaleStepFactor;
     }
     // 情况2：内容过疏 → 需要增大缩放比例（填充可用空间）
     else {
@@ -294,7 +294,7 @@ class QuickMethod_View extends QuickMethod_Set {
         1 +
         ((requiredGridMaxValue / maxDensity - axisConfig.min) / axisConfig.min +
           shrinkLevel) *
-          scaleStepFactor;
+        scaleStepFactor;
     }
 
     // 应用最大缩放限制（若配置）
@@ -337,11 +337,11 @@ class QuickMethod_View extends QuickMethod_Set {
     return {
       x: Math.round(
         -(targetCenterPoint.x + (avoid[3] - avoid[1]) - nowCenterPoint.x) *
-          axisConfig.x
+        axisConfig.x
       ),
       y: Math.round(
         -(targetCenterPoint.y + (avoid[0] - avoid[2]) - nowCenterPoint.y) *
-          axisConfig.y
+        axisConfig.y
       ),
     };
   }
@@ -532,4 +532,4 @@ class QuickMethod_Ctx extends QuickMethod_Toggle {
 }
 
 /** 快速方法 */
-export default class QuickMethod extends QuickMethod_Ctx {}
+export default class QuickMethod extends QuickMethod_Ctx { }

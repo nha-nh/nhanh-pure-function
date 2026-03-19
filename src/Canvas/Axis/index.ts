@@ -20,7 +20,7 @@ import { DeepArray } from "./common.type";
 
 type ConstructorOption = ConstructorParameters<typeof QuickMethod>[0] & {
   /** 轴线显示属性 */
-  axisShow?: Parameters<_Canvas["toggleAxis"]>[0];
+  axisShow?: Parameters<_Canvas_Axis["toggleAxis"]>[0];
 };
 
 function FlattenAll<T>(arr: any): T[] {
@@ -33,10 +33,10 @@ function FlattenAll<T>(arr: any): T[] {
  *
  * 使用示例:
  * - GitHub演示:
- *   - 基础画布: https://nha-nh.github.io/canvas/_Canvas
+ *   - 基础画布: https://nha-nh.github.io/canvas/_Canvas_Axis
  *   - 动态图表(月牙定理): https://nha-nh.github.io/math/DynamicDiagram/%E6%9C%88%E7%89%99%E5%AE%9A%E7%90%86
  */
-export class _Canvas extends QuickMethod {
+export class _Canvas_Axis extends QuickMethod {
   /** 视图适配工具：默认缩放、居中计算 */
   static ViewFit = ViewFit;
 
@@ -191,4 +191,5 @@ export class _Canvas extends QuickMethod {
   }
 }
 
-export default _Canvas;
+export default _Canvas_Axis;
+
