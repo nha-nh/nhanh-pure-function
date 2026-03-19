@@ -2,7 +2,7 @@ import {
   _Utility_MergeObjects,
   _Valid_Is2DNumberArray,
   _Valid_IsNumberArray,
-} from "../../../../";
+} from "../../../";
 import _Canvas_Axis from "..";
 import Overlay from "./public/overlay";
 import { type OverlayType } from "./index";

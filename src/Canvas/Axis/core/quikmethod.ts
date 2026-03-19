@@ -1,4 +1,4 @@
-import { _Animate_Schedule, _Type_DeepPartial } from "../../../../";
+import { _Animate_Schedule, _Type_DeepPartial } from "../../../";
 import Axis from "./axis";
 import Event from "./event";
 import OverlayGroup, { type OverlayType } from "../OverlayGroup";

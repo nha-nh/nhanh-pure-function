@@ -3,7 +3,7 @@ import {
   _Math_CalculateDistance2D,
   _Valid_IsNumberArray,
   _Math_GetMidpoint,
-} from "../../../../";
+} from "../../../";
 import type { OverlayType } from "../OverlayGroup";
 import Draw from "./draw";
 import type { EventHandler } from "../public/eventController";

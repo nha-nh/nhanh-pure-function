@@ -1,4 +1,4 @@
-import { _Utility_MergeObjects, _Valid_Is2DNumberArray } from "../../../../";
+import { _Utility_MergeObjects, _Valid_Is2DNumberArray } from "../../../";
 import _Canvas_Axis from "..";
 import Overlay from "./public/overlay";
 import { type OverlayType } from "./index";

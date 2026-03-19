@@ -2,7 +2,7 @@ import {
   _Type_DeepPartial,
   _Utility_Clone,
   _Utility_MergeObjects,
-} from "../../../../";
+} from "../../../";
 import { KnownStyleKeys, StyleItemType, StyleType } from "../common.type";
 import BaseData from "./basedata";
 

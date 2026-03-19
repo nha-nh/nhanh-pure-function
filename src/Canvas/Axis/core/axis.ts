@@ -1,6 +1,6 @@
 import Decimal from "decimal.js";
 import type Canvas from "..";
-import { _Format_NumberWithCommas, _Type_DeepPartial } from "../../../../";
+import { _Format_NumberWithCommas, _Type_DeepPartial } from "../../../";
 
 export default class Axis {
   /** 画布 */

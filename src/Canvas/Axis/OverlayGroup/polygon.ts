@@ -2,7 +2,7 @@ import _Canvas_Axis from "..";
 import Overlay from "./public/overlay";
 import { type OverlayType } from "./index";
 import GeometricBoundary from "./public/geometricBoundary";
-import { _Utility_MergeObjects, _Valid_Is2DNumberArray } from "../../../../";
+import { _Utility_MergeObjects, _Valid_Is2DNumberArray } from "../../../";
 import { PolygonStyleType } from "../common.type";
 
 type ConstructorOption = ConstructorParameters<
