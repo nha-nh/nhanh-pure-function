@@ -19,7 +19,7 @@ export function _Format_CapitalizeFirstLetter(string: string) {
 export function _Format_Percentage(
   value: number,
   totalValue: number,
-  decimalPlaces = 2
+  decimalPlaces = 2,
 ): string {
   if (
     !Number.isFinite(value) ||
@@ -83,7 +83,7 @@ export function _Format_NumberWithUnit(
     join?: boolean;
     suffix?: string;
     decimalPlaces?: number;
-  }
+  },
 ) {
   // 默认配置
   const defaultConfig = {
@@ -144,7 +144,7 @@ export function _Format_FileSize(size: number) {
 export function _Format_Timestamp(
   time: number | Date,
   template = "YYYY-MM-DD hh:mm:ss",
-  pad = true
+  pad = true,
 ) {
   const date = new Date(time);
 
@@ -220,11 +220,11 @@ export function _Format_CamelCase(str: string, isRemoveDelimiter?: boolean) {
 export function _Format_ExcludeSubstring(
   inputString: string,
   substringToDelete: string,
-  delimiter = ","
+  delimiter = ",",
 ) {
   const regex = new RegExp(
     `(^|${delimiter})${substringToDelete}(${delimiter}|$)`,
-    "g"
+    "g",
   );
   return inputString.replace(regex, function ($0, $1, $2) {
     return $1 === $2 ? delimiter : "";
@@ -251,14 +251,14 @@ export function _Format_ToggleInvisibleChars(str: string, escape = true) {
 
   // 还原映射表（反转转义映射）
   const unescapeMap = Object.fromEntries(
-    Object.entries(escapeMap).map(([key, value]) => [value, key])
+    Object.entries(escapeMap).map(([key, value]) => [value, key]),
   );
 
   if (escape) {
     // 转义模式：将不可见字符转为转义序列
     return str.replace(
       /[\b\t\n\v\f\r ]/g,
-      (match) => escapeMap[match as keyof typeof escapeMap]
+      (match) => escapeMap[match as keyof typeof escapeMap],
     );
   } else {
     // 还原模式：将转义序列转为实际字符

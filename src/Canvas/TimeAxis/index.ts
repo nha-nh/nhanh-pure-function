@@ -1,5 +1,10 @@
 import { _Animate_NumericTransition, _Format_Timestamp } from "../..";
-
+import type {
+  TimeAxisAnimationCurve,
+  TimeAxisFillStyle,
+  TimeAxisMouseTimeInfo,
+  TimeAxisRect,
+} from "./type";
 
 class TimeAxisCanvasManager {
   /** Canvas DOM id（用于 `document.getElementById` 定位） */
@@ -230,16 +235,6 @@ class TimeAxisWheelZoom {
  * - 监听 canvas 的 mousemove / mouseleave
  * - 通知外部：显示/隐藏、canvasX、time
  */
-type TimeAxisMouseTimeInfo = {
-  /** 是否显示指示线/时间提示 */
-  visible: boolean;
-  /** 鼠标在 canvas 内的 x（像素） */
-  canvasX: number;
-  /** 鼠标在 canvas 内的 y（像素） */
-  canvasY: number;
-  /** 鼠标位置对应的时间戳（ms） */
-  time: number;
-};
 class TimeAxisMouseTimeReporter {
   /** 绑定 mouse 事件的 canvas 元素 */
   private canvas: HTMLCanvasElement;
@@ -297,11 +292,6 @@ class TimeAxisMouseTimeReporter {
     this.canvas.removeEventListener("mouseleave", this.handleMouseLeave);
   }
 }
-
-/**
- * 时间轴动画曲线：入参 `t` 为 [0, 1]，返回 eased 后的进度（也应为 [0, 1]）
- */
-type TimeAxisAnimationCurve = (t: number) => number;
 
 /**
  * 内置动画曲线（可按需在 animateCenterTimeTo options.curve 中替换）
@@ -635,6 +625,33 @@ class TimeAxisBase {
  */
 export class _Canvas_TimeAxis extends TimeAxisBase {
   /**
+   * 将填充样式解析为 ctx.fillStyle 可用的值（纯色或线性渐变）
+   * @param rect 矩形区域，用于计算渐变起止点
+   * @param fillStyle 纯色字符串或渐变配置
+   */
+  private resolveFillStyle(
+    rect: TimeAxisRect,
+    fillStyle?: TimeAxisFillStyle,
+  ): string | CanvasGradient | undefined {
+    if (!fillStyle) return undefined;
+    const ctx = this.canvasManager.getContext();
+    if (!ctx) return undefined;
+
+    if (typeof fillStyle === "string") return fillStyle;
+
+    const gradient = ctx.createLinearGradient(
+      rect.x + rect.width * fillStyle.x1,
+      rect.y + rect.height * fillStyle.y1,
+      rect.x + rect.width * fillStyle.x2,
+      rect.y + rect.height * fillStyle.y2,
+    );
+    fillStyle.colorStops.forEach(({ color, offset }) =>
+      gradient.addColorStop(offset, color),
+    );
+    return gradient;
+  }
+
+  /**
    * 按时间范围绘制圆角矩形（常用于高亮某段时间区间）
    */
   drawTimeRangeRoundedRect(options: {
@@ -648,8 +665,8 @@ export class _Canvas_TimeAxis extends TimeAxisBase {
     height?: number;
     /** 圆角半径：可为单值或 canvas roundRect 支持的数组（默认 10） */
     radius?: number | number[];
-    /** 填充色：不传则不填充 */
-    fillStyle?: string;
+    /** 填充色：不传则不填充，支持纯色或线性渐变 */
+    fillStyle?: TimeAxisFillStyle;
     /** 描边色：不传则不描边 */
     strokeStyle?: string;
     /** 描边线宽（默认 1） */
@@ -674,16 +691,18 @@ export class _Canvas_TimeAxis extends TimeAxisBase {
     const w = x2 - x1;
     if (!w) return;
 
-    if (fillStyle) ctx.fillStyle = fillStyle;
+    const resolvedFill = this.resolveFillStyle({ x: x1, y, width: w, height }, fillStyle)
+
+    if (resolvedFill) ctx.fillStyle = resolvedFill;
     if (strokeStyle) ctx.strokeStyle = strokeStyle;
     ctx.lineWidth = lineWidth;
     ctx.beginPath();
 
     // Canvas 2D 新接口，现代浏览器支持；不支持时退化为普通 rect
     if (typeof (ctx as any).roundRect === "function") {
-      (ctx as any).roundRect(x1, y, w, height - y, radius);
+      (ctx as any).roundRect(x1, y, w, height + y, radius);
     } else {
-      ctx.rect(x1, y, w, height - y);
+      ctx.rect(x1, y, w, height + y);
     }
 
     if (fillStyle) ctx.fill();
@@ -692,5 +711,3 @@ export class _Canvas_TimeAxis extends TimeAxisBase {
 }
 
 export default _Canvas_TimeAxis;
-
-

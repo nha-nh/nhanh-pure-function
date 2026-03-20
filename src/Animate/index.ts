@@ -149,14 +149,14 @@ export function _Animate_CreateOscillator(
  * @param targetValue - 目标值
  * @param stepCount - 动画步数
  * @param callback - 每帧回调函数
- * @param precision - 数值精度（默认2位小数）
+ * @param precision - 数值精度（默认4位小数）
  */
 export function _Animate_NumericTransition(
   startValue: number,
   targetValue: number,
   stepCount: number,
   callback: (currentValue: number) => void,
-  precision: number = 2
+  precision: number = 4
 ): void {
   if (stepCount <= 0) return console.error("动画步数 必须为正数");
 
@@ -189,4 +189,67 @@ export function _Animate_NumericTransition(
 
   // 启动动画
   animate();
+}
+
+
+/**
+ * 三次贝塞尔缓动（与 CSS `cubic-bezier(x1, y1, x2, y2)` 语义一致）
+ * 曲线端点为 (0,0) → (1,1)，控制点为 (x1,y1)、(x2,y2)。
+ * @param x1 第一个控制点 x
+ * @param y1 第一个控制点 y
+ * @param x2 第二个控制点 x
+ * @param y2 第二个控制点 y
+ * @returns 接收归一化时间 `t ∈ [0,1]`，返回缓动后的进度 `∈ [0,1]`（一般情况）
+ */
+export function _Animate_CubicBezier(
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number,
+): (t: number) => number {
+  /** B_x(u)，u 为贝塞尔参数 */
+  const sampleX = (u: number) =>
+    3 * (1 - u) ** 2 * u * x1 + 3 * (1 - u) * u ** 2 * x2 + u ** 3;
+
+  /** B_y(u) */
+  const sampleY = (u: number) =>
+    3 * (1 - u) ** 2 * u * y1 + 3 * (1 - u) * u ** 2 * y2 + u ** 3;
+
+  /** d(B_x)/du */
+  const sampleXD = (u: number) =>
+    3 * x1 * (1 - u) * (1 - 3 * u) + 3 * x2 * (2 * u - 3 * u ** 2) + 3 * u ** 2;
+
+  /** 已知目标 x=t，求参数 u（牛顿法 + 二分回退） */
+  const solveU = (t: number): number => {
+    if (t <= 0) return 0;
+    if (t >= 1) return 1;
+
+    let u = t;
+    for (let i = 0; i < 8; i++) {
+      const x = sampleX(u) - t;
+      if (Math.abs(x) < 1e-6) return u;
+      const d = sampleXD(u);
+      if (Math.abs(d) < 1e-6) break;
+      const next = u - x / d;
+      if (next < 0 || next > 1) break;
+      u = next;
+    }
+
+    let lo = 0;
+    let hi = 1;
+    u = t;
+    for (let i = 0; i < 24; i++) {
+      const x = sampleX(u) - t;
+      if (Math.abs(x) < 1e-6) return u;
+      if (x > 0) hi = u;
+      else lo = u;
+      u = (lo + hi) / 2;
+    }
+    return u;
+  };
+
+  return (time: number) => {
+    const t = Math.min(1, Math.max(0, time));
+    return sampleY(solveU(t));
+  };
 }
