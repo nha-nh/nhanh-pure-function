@@ -6,6 +6,8 @@ import {
   UiLibrary,
 } from "./type";
 
+export * from "./Runtime";
+
 /**
  * 滚动结束监听器
  * @param {(trigger: "vertical" | "horizontal") => void} callback
@@ -246,7 +248,7 @@ export class _Element_LocalDrag {
       const v = (type: "top" | "left") =>
         this.#limit
           ? (value[type] - this.#limit.min[type]) /
-            (this.#limit.max[type] - this.#limit.min[type])
+          (this.#limit.max[type] - this.#limit.min[type])
           : 0;
 
       value.percentage = {
@@ -301,125 +303,6 @@ export class _Element_LocalDrag {
   }
 }
 
-/** 获取元素 */
-function GetElement(element?: HTMLElement | string) {
-  if (typeof element === "string") {
-    const dom = document.querySelector(element) as HTMLElement;
-    if (dom) {
-      return dom;
-    } else {
-      console.error(`Element "${element}" not found`);
-    }
-  } else {
-    return element || document.documentElement;
-  }
-}
-/** 进入全屏模式 */
-export function _Element_EnterFullscreen(
-  element?: HTMLElement | string
-): Promise<void> {
-  const ts_element = GetElement(element) as any;
-
-  if (!ts_element) return Promise.reject("No Element");
-
-  if (ts_element.requestFullscreen) {
-    return ts_element.requestFullscreen();
-  } else if (ts_element.mozRequestFullScreen) {
-    // Firefox
-    return ts_element.mozRequestFullScreen();
-  } else if (ts_element.webkitRequestFullscreen) {
-    // Chrome, Safari and Opera
-    return ts_element.webkitRequestFullscreen();
-  } else if (ts_element.msRequestFullscreen) {
-    // IE/Edge
-    return ts_element.msRequestFullscreen();
-  }
-  return Promise.reject("No Fullscreen API");
-}
-/** 退出全屏模式 */
-export function _Element_ExitFullscreen(): Promise<void> {
-  const ts_document = document as any;
-
-  if (document.exitFullscreen) {
-    return document.exitFullscreen();
-  } else if (ts_document.mozCancelFullScreen) {
-    // Firefox
-    return ts_document.mozCancelFullScreen();
-  } else if (ts_document.webkitExitFullscreen) {
-    // Chrome, Safari and Opera
-    return ts_document.webkitExitFullscreen();
-  } else if (ts_document.msExitFullscreen) {
-    // IE/Edge
-    return ts_document.msExitFullscreen();
-  }
-  return Promise.reject("No ExitFullscreen API");
-}
-/** 判断是否处于全屏模式 */
-export function _Element_IsFullscreen(element?: HTMLElement | string) {
-  const ts_element = GetElement(element) as any;
-  const ts_document = document as any;
-
-  const fullTarget =
-    document.fullscreenElement ||
-    ts_document.webkitFullscreenElement ||
-    ts_document.mozFullScreenElement ||
-    ts_document.msFullscreenElement;
-
-  return (
-    ts_element == fullTarget ||
-    (!element &&
-      window.innerWidth == screen.width &&
-      window.innerHeight == screen.height)
-  );
-}
-/**
- * 返回一个用于切换全屏模式的函数
- * @param {HTMLElement} content - 需要进入全屏的元素
- * 该函数通过检查不同浏览器的特定方法来实现全屏切换
- */
-export function _Element_Fullscreen(element?: HTMLElement | string) {
-  element = GetElement(element);
-  if (!element) return;
-  return function () {
-    if (_Element_IsFullscreen(element)) _Element_ExitFullscreen();
-    else _Element_EnterFullscreen(element);
-  };
-}
-/**
- * 元素全屏状态观察器
- * 监听元素的全屏状态变化，并通过回调函数通知状态改变
- * @param notify - 全屏状态变化回调函数，接收一个布尔值参数表示当前是否为全屏状态
- * @param selectors - 要观察的元素或元素选择器，默认为document.documentElement
- * @returns 返回一个清理函数，调用后可移除所有事件监听器
- */
-export function _Element_FullscreenObserver(
-  notify: (isFull: boolean) => void,
-  selectors?: HTMLElement | string
-) {
-  const element = GetElement(selectors);
-
-  if (!element) return;
-
-  // 使用全屏事件监听而非ResizeObserver，更准确
-  const handleChange = () => {
-    notify(_Element_IsFullscreen(element));
-  };
-
-  document.addEventListener("fullscreenchange", handleChange);
-  document.addEventListener("webkitfullscreenchange", handleChange);
-  document.addEventListener("mozfullscreenchange", handleChange);
-  document.addEventListener("MSFullscreenChange", handleChange);
-
-  // 初始状态通知
-  handleChange();
-
-  return () => {
-    document.removeEventListener("fullscreenchange", handleChange);
-    document.removeEventListener("webkitfullscreenchange", handleChange);
-    document.removeEventListener("mozfullscreenchange", handleChange);
-    document.removeEventListener("MSFullscreenChange", handleChange);
-  };
-}
 
 /**
  * 单位转换 12** -> **px
