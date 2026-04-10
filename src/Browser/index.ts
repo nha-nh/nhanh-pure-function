@@ -1,5 +1,8 @@
 import { PAPER_SIZE_DEFINITIONS, PaperType, WindowTarget } from "../Constant";
 import { _Utility_GenerateUUID, _Utility_WaitForCondition } from "../Utility";
+import { ChannelMessage, ChannelMessageType } from "./type";
+
+export * from "./Runtime";
 
 /**
  * 获取帧率
@@ -164,23 +167,6 @@ export function _Browser_CalculatePrintableArea(
   };
 }
 
-/** 定义消息类型枚举，避免硬编码字符串 */
-enum ChannelMessageType {
-  /** 回执消息 */
-  RESPONSE = "response",
-  /** 询问消息 */
-  QUERY = "query",
-}
-
-/** 基础消息结构 */
-interface ChannelMessage {
-  /** 消息类型 */
-  type: ChannelMessageType;
-  /** 消息关联的标识键 */
-  responseKey: string;
-  /** 标签页名称 "*" 表示所有标签页 */
-  name: string;
-}
 
 /** 同源标签页管理器类 */
 export class _Browser_SameOriginTabManager {
@@ -202,7 +188,7 @@ export class _Browser_SameOriginTabManager {
     ((tabName: string) => void)[]
   >();
 
-  private constructor() {}
+  private constructor() { }
 
   /** 初始化标签页管理器 */
   static init(name: string) {
@@ -333,4 +319,77 @@ export class _Browser_SameOriginTabManager {
       }, this.timeout);
     });
   }
+}
+
+/**
+ * 无操作（闲置）检测类
+ * 监听用户键盘、鼠标操作，更新用户活跃状态
+ * 支持注册/触发活跃/闲置状态的回调通知
+ */
+export class _Browser_IdleDetection {
+  /** 用户状态：active(活跃) / idle(闲置) */
+  status: "active" | "idle" = "active";
+
+  /** 活跃状态回调通知集合（key: 回调标识，value: 回调函数） */
+  readonly activeCallbacks = new Map<string, () => void>();
+
+  /** 闲置状态回调通知集合（key: 回调标识，value: 回调函数） */
+  readonly idleCallbacks = new Map<string, () => void>();
+
+  /** 闲置时间（分钟） */
+  idleTime = 5;
+  /** 闲置判定定时器（5分钟无操作触发闲置状态） */
+  private timeoutTimer?: ReturnType<typeof setTimeout>;
+
+  constructor() {
+    // 监听用户操作事件，触发活跃状态
+    window.addEventListener("keypress", this.activate);
+    window.addEventListener("mousemove", this.activate);
+    window.addEventListener("mousedown", this.activate);
+    window.addEventListener("wheel", this.activate);
+
+    // 初始化定时器（页面加载后开始计时）
+    this.resetTimeoutTimer();
+  }
+
+  /**
+   * 重置闲置判定定时器
+   * 每次用户操作时重置，重新开始5分钟计时
+   */
+  resetTimeoutTimer() {
+    if (this.timeoutTimer) clearTimeout(this.timeoutTimer);
+    this.timeoutTimer = setTimeout(this.markAsIdle, 1000 * 60 * this.idleTime);
+  }
+
+  /**
+   * 激活为活跃状态
+   * 触发活跃回调，并重置定时器
+   */
+  private activate = () => {
+    if (this.status === "idle") {
+      this.status = "active";
+      console.log(
+        "%c已进入活跃状态",
+        "background: #4CAF50; color: white; padding: 2px 4px; border-radius: 4px; font-weight: bold;",
+      );
+      this.activeCallbacks.forEach((callback) => callback());
+    }
+    this.resetTimeoutTimer();
+  };
+
+  /**
+   * 标记为闲置状态
+   * 触发闲置回调，并清除定时器
+   */
+  private markAsIdle = () => {
+    if (this.timeoutTimer) clearTimeout(this.timeoutTimer);
+    if (this.status === "active") {
+      this.status = "idle";
+      console.log(
+        "%c已进入闲置状态",
+        "background: #9E9E9E; color: white; padding: 2px 4px; border-radius: 4px; font-weight: bold;",
+      );
+      this.idleCallbacks.forEach((callback) => callback());
+    }
+  };
 }
