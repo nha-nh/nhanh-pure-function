@@ -109,6 +109,7 @@ export class _Browser_WebSocketClient {
   }
   /** 开始 */
   start(url: string) {
+    this.stop();
     const socket = new WebSocket(url);
     this.socket = socket;
     this.url = url;

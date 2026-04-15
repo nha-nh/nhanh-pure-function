@@ -51,11 +51,6 @@ export default class OverlayCreator {
     canvas.canvas.addEventListener("mousemove", this.handleMousemove);
   }
 
-  /** 按类型开始创建：多边形或线 */
-  create(type: "polygon" | "line") {
-    if (type === "polygon") return this.createPolygon();
-    else if (type === "line") return this.createLine();
-  }
   /** 禁用除创建层外的其他图层群组交互，并记录原始 isInteractive 以便复原 */
   private disableOtherLayerGroups() {
     this.canvas.layerGroups.forEach((layerGroup) => {
@@ -78,20 +73,21 @@ export default class OverlayCreator {
     });
     this.savedLayerGroupInteractive.clear();
   }
-
-  createLine() {
+  createLine(options?: ConstructorParameters<typeof _Canvas_Axis.Line>[0]) {
     this.disableOtherLayerGroups();
     if (this.overlay) this.overlayGroup.removeOverlay(this.overlay);
     this.axisValueList = [];
-    this.overlay = new _Canvas_Axis.Line({});
+    this.overlay = new _Canvas_Axis.Line({ ...options });
     this.overlayGroup.addOverlay(this.overlay);
     return this.overlay;
   }
-  createPolygon() {
+  createPolygon(
+    options?: ConstructorParameters<typeof _Canvas_Axis.Polygon>[0],
+  ) {
     this.disableOtherLayerGroups();
     if (this.overlay) this.overlayGroup.removeOverlay(this.overlay);
     this.axisValueList = [];
-    this.overlay = new _Canvas_Axis.Polygon({});
+    this.overlay = new _Canvas_Axis.Polygon({ ...options });
     this.overlayGroup.addOverlay(this.overlay);
     return this.overlay;
   }

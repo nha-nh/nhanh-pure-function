@@ -13,7 +13,7 @@ export * from "./Runtime";
  * @param {(trigger: "vertical" | "horizontal") => void} callback
  */
 export function _Element_ScrollEndListener(
-  callback: (trigger: "vertical" | "horizontal") => void
+  callback: (trigger: "vertical" | "horizontal") => void,
 ) {
   const debouncedCallback = _Utility_Debounce(callback, 100);
   let lastScrollTop = 0;
@@ -69,7 +69,7 @@ export function _Element_CloseOnOutsideClick(
   options?: {
     uiLibrary?: UiLibrary[];
     isClickAllowed?: (event: MouseEvent) => boolean | undefined;
-  }
+  },
 ) {
   const { isClickAllowed, uiLibrary = ["naiveUI", "ElementPlus", "Element"] } =
     options || {};
@@ -116,7 +116,7 @@ export function _Element_CloseOnOutsideClick(
     if (!isClickable) end();
   }
   requestAnimationFrame(() =>
-    document.addEventListener("mousedown", mousedown)
+    document.addEventListener("mousedown", mousedown),
   );
 }
 
@@ -133,6 +133,7 @@ export class _Element_Drag {
   #dragDom: DragOption["dragDom"] = undefined;
 
   init(dom: HTMLElement, option?: DragOption) {
+    this.finish();
     this.#dom = dom;
     this.#limit = option?.limit;
     this.#dragDom = option?.dragDom;
@@ -214,6 +215,7 @@ export class _Element_LocalDrag {
   #update_up: LocalDragOptions["update_up"] = undefined;
 
   init(parentDom: HTMLElement, options: LocalDragOptions = {}) {
+    this.finish();
     this.#parentDom = parentDom;
     this.#limit = options.limit;
     this.#update_move = options.update_move;
@@ -248,7 +250,7 @@ export class _Element_LocalDrag {
       const v = (type: "top" | "left") =>
         this.#limit
           ? (value[type] - this.#limit.min[type]) /
-          (this.#limit.max[type] - this.#limit.min[type])
+            (this.#limit.max[type] - this.#limit.min[type])
           : 0;
 
       value.percentage = {
@@ -303,7 +305,6 @@ export class _Element_LocalDrag {
   }
 }
 
-
 /**
  * 单位转换 12** -> **px
  * @param {string} width
@@ -311,7 +312,7 @@ export class _Element_LocalDrag {
  */
 export function _Element_GetOtherSizeInPixels(
   width: string,
-  target?: HTMLElement
+  target?: HTMLElement,
 ) {
   if (typeof width == "number") return width;
   if (/px/.test(width)) return Number(width.replace(/px/, "")) || 0;
@@ -334,7 +335,7 @@ export function _Element_GetOtherSizeInPixels(
  */
 export function _Element_CalculateCanvasSize(
   aspectRatio: number,
-  target: Element | string | [number, number]
+  target: Element | string | [number, number],
 ) {
   // 检查宽高比是否有效，若无效则不进行计算
   if (!aspectRatio) return;
@@ -381,7 +382,7 @@ export function _Element_CalculateCanvasSize(
  */
 export function _Element_LoadImage(
   src: string,
-  timeout: number = 5000
+  timeout: number = 5000,
 ): Promise<[HTMLImageElement, number]> {
   return new Promise((resolve, reject) => {
     const img: HTMLImageElement = new Image();
@@ -481,7 +482,7 @@ export function _Element_CheckImagesLoaded(id: string): Promise<{
           loadedCount++;
           checkCompletion();
         },
-        { once: true }
+        { once: true },
       );
 
       // 监听加载失败事件（如404、格式错误）
@@ -492,7 +493,7 @@ export function _Element_CheckImagesLoaded(id: string): Promise<{
           loadedCount++;
           checkCompletion();
         },
-        { once: true }
+        { once: true },
       );
     });
   });

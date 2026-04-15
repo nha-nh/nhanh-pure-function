@@ -30,6 +30,7 @@ class TimeAxisCanvasManager {
    * @returns true 表示初始化成功；false 表示找不到 canvas 或上下文
    */
   init(onResize: () => void) {
+    this.destroy();
     this.canvas = document.getElementById(this.id) as HTMLCanvasElement;
     if (!this.canvas) {
       console.error(`Canvas with id ${this.id} not found`);
@@ -691,7 +692,10 @@ export class _Canvas_TimeAxis extends TimeAxisBase {
     const w = x2 - x1;
     if (!w) return;
 
-    const resolvedFill = this.resolveFillStyle({ x: x1, y, width: w, height }, fillStyle)
+    const resolvedFill = this.resolveFillStyle(
+      { x: x1, y, width: w, height },
+      fillStyle,
+    );
 
     if (resolvedFill) ctx.fillStyle = resolvedFill;
     if (strokeStyle) ctx.strokeStyle = strokeStyle;
