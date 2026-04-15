@@ -33,12 +33,22 @@ class QuickMethod_Get extends Event {
     const overlays_custom = layerGroup
       .getLayer("自定义绘制图层")
       ?.getGroup("自定义绘制覆盖物群组");
+    const overlays_billboard = layerGroup
+      .getLayer("图片图层")
+      ?.getGroup("图片覆盖物群组");
+
+    const overlays_other = layerGroup
+      .getLayer("其他图层")
+      ?.getGroup("其他覆盖物群组");
+
     return {
       overlays_text,
       overlays_point,
       overlays_line,
       overlays_polygon,
       overlays_custom,
+      overlays_billboard,
+      overlays_other,
     };
   }
   /**
@@ -126,7 +136,7 @@ class QuickMethod_View extends QuickMethod_Set {
     overlays: SingleOrArray<NodeType> | undefined = undefined,
     immediately: boolean = false,
     avoid: [number, number, number, number] = [60, 60, 60, 60],
-    maxScale?: number
+    maxScale?: number,
   ) {
     // 获取目标覆盖层并过滤属于当前画布的覆盖层
     const targetOverlays = this.getAllOverlays(overlays);
@@ -145,7 +155,7 @@ class QuickMethod_View extends QuickMethod_Set {
       targetWidth_Value,
       targetHeight_Value,
       avoid,
-      maxScale
+      maxScale,
     );
 
     // 计算目标位置偏移
@@ -154,7 +164,7 @@ class QuickMethod_View extends QuickMethod_Set {
       maxX,
       minY,
       maxY,
-      avoid
+      avoid,
     );
 
     if (
@@ -209,7 +219,7 @@ class QuickMethod_View extends QuickMethod_Set {
     visibleWidthValue: number,
     visibleHeightValue: number,
     margins: [number, number, number, number],
-    maxScale?: number
+    maxScale?: number,
   ): number {
     // 获取画布尺寸和轴配置
     const { cycle, delta, axisConfig, rect } = this;
@@ -258,7 +268,7 @@ class QuickMethod_View extends QuickMethod_Set {
         1 -
         ((requiredGridMaxValue / maxDensity - axisConfig.min) / axisConfig.min +
           (densityMultiplier - 2)) *
-        scaleStepFactor;
+          scaleStepFactor;
     }
     // 情况2：内容过疏 → 需要增大缩放比例（填充可用空间）
     else {
@@ -272,7 +282,7 @@ class QuickMethod_View extends QuickMethod_Set {
       const calculateRecursiveLevel = (
         value: number,
         minValue: number,
-        level: number
+        level: number,
       ): number =>
         value < minValue
           ? level - 1
@@ -294,7 +304,7 @@ class QuickMethod_View extends QuickMethod_Set {
         1 +
         ((requiredGridMaxValue / maxDensity - axisConfig.min) / axisConfig.min +
           shrinkLevel) *
-        scaleStepFactor;
+          scaleStepFactor;
     }
 
     // 应用最大缩放限制（若配置）
@@ -315,7 +325,7 @@ class QuickMethod_View extends QuickMethod_Set {
     maxX: number,
     minY: number,
     maxY: number,
-    avoid: [number, number, number, number]
+    avoid: [number, number, number, number],
   ) {
     const { width, height } = this.rect;
     const { axisConfig, center } = this;
@@ -327,28 +337,28 @@ class QuickMethod_View extends QuickMethod_Set {
 
     const nowCenterValue = this.getAxisValueByPoint(
       (width / 2 - center.x) * axisConfig.x,
-      (height / 2 - center.y) * axisConfig.y
+      (height / 2 - center.y) * axisConfig.y,
     );
     const nowCenterPoint = this.getAxisPointByValue(
       nowCenterValue.xV,
-      nowCenterValue.yV
+      nowCenterValue.yV,
     );
 
     return {
       x: Math.round(
         -(targetCenterPoint.x + (avoid[3] - avoid[1]) - nowCenterPoint.x) *
-        axisConfig.x
+          axisConfig.x,
       ),
       y: Math.round(
         -(targetCenterPoint.y + (avoid[0] - avoid[2]) - nowCenterPoint.y) *
-        axisConfig.y
+          axisConfig.y,
       ),
     };
   }
   /** 立即应用变换 */
   private applyTransformImmediately(
     targetScale: number,
-    offsetDifference: { x: number; y: number }
+    offsetDifference: { x: number; y: number },
   ) {
     this.offset = {
       x: this.offset.x + offsetDifference.x,
@@ -361,7 +371,7 @@ class QuickMethod_View extends QuickMethod_Set {
   /** 执行动画过渡 */
   private animateTransform(
     targetScale: number,
-    offsetDifference: { x: number; y: number }
+    offsetDifference: { x: number; y: number },
   ) {
     const initialScale = this.scale;
     const initialOffset = { ...this.offset };
@@ -375,14 +385,14 @@ class QuickMethod_View extends QuickMethod_Set {
         initialScale,
         targetScale,
         duration,
-        onComplete || finish
+        onComplete || finish,
       );
     const animateOffset = (onComplete?: () => void) =>
       this.animateOffset(
         initialOffset,
         offsetDifference,
         duration,
-        onComplete || finish
+        onComplete || finish,
       );
 
     animateOffset(animateScale);
@@ -392,7 +402,7 @@ class QuickMethod_View extends QuickMethod_Set {
     initialScale: number,
     targetScale: number,
     duration: number,
-    onComplete: () => void
+    onComplete: () => void,
   ) {
     const scaleDifference = targetScale - initialScale;
     let oldSchedule = 0;
@@ -412,7 +422,7 @@ class QuickMethod_View extends QuickMethod_Set {
     initialOffset: { x: number; y: number },
     offsetDifference: { x: number; y: number },
     duration: number,
-    onComplete: () => void
+    onComplete: () => void,
   ) {
     _Animate_Schedule((schedule) => {
       if (!this.isAuto || !this.canvas || !this.isInteractive) return;
@@ -457,10 +467,10 @@ class QuickMethod_View extends QuickMethod_Set {
     const valuePx = axisConfig.size / this.getNowGridCount;
 
     const xDifference = Math.round(
-      (canvasValue.xV - centerValue.xV) * axisConfig.x * valuePx
+      (canvasValue.xV - centerValue.xV) * axisConfig.x * valuePx,
     );
     const yDifference = Math.round(
-      (canvasValue.yV - centerValue.yV) * axisConfig.y * valuePx
+      (canvasValue.yV - centerValue.yV) * axisConfig.y * valuePx,
     );
 
     if (xDifference == 0 && yDifference == 0) return;
@@ -532,4 +542,4 @@ class QuickMethod_Ctx extends QuickMethod_Toggle {
 }
 
 /** 快速方法 */
-export default class QuickMethod extends QuickMethod_Ctx { }
+export default class QuickMethod extends QuickMethod_Ctx {}

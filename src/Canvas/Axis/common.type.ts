@@ -103,6 +103,12 @@ export type PolygonStyleType = {
   point: PointStyleType;
 };
 
+/** 广告牌样式 */
+export type BillboardStyleType = {
+  /** 描边 */
+  stroke: BaseLineStyle;
+};
+
 /** 主题样式 */
 export type StyleItemType = {
   /** 背景色 */
@@ -121,6 +127,8 @@ export type StyleItemType = {
   arcTo: ArcToStyleType;
   /** 面样式 */
   polygon: PolygonStyleType;
+  /** 广告牌样式 */
+  billboard: BillboardStyleType;
 };
 
 /** 主题样式 */

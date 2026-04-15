@@ -51,12 +51,12 @@ export default class LayerGroup extends EventController {
   setNotifyReload(notifyReload?: () => void) {
     this.notifyReload = notifyReload
       ? (needForceExecute) => {
-        if (needForceExecute) this.isRecalculate = true;
+          if (needForceExecute) this.isRecalculate = true;
 
-        if (needForceExecute || (this.shouldRender() && this.layers.size)) {
-          notifyReload();
+          if (needForceExecute || (this.shouldRender() && this.layers.size)) {
+            notifyReload();
+          }
         }
-      }
       : undefined;
 
     this.layers.forEach((layer) => layer.setNotifyReload(this.notifyReload));
@@ -92,7 +92,7 @@ export default class LayerGroup extends EventController {
     isReload && this.notifyReload?.();
   }
   /** 清空图层 */
-  clearLayers() {
+  clearLayer() {
     if (this.layers.size) {
       this.layers.forEach((layer) => {
         layer.setNotifyReload();
@@ -110,7 +110,7 @@ export default class LayerGroup extends EventController {
       const canvasArr: [
         number,
         HTMLCanvasElement,
-        [[number, number], OverlayType][]
+        [[number, number], OverlayType][],
       ][] = [];
       this.layers.forEach((layer) => {
         if (layer.equalsMainCanvas(this.mainCanvas)) {

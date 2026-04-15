@@ -10,14 +10,18 @@ import type { EventHandler } from "../public/eventController";
 export default class OverlayCreator {
   /** 绑定的画布实例 */
   private canvas: _Canvas_Axis;
-  private layerGroup = new _Canvas_Axis.LayerGroup({ name: "创建覆盖物图层群组" });
+  private layerGroup = new _Canvas_Axis.LayerGroup({
+    name: "创建覆盖物图层群组",
+  });
   /** 创建中覆盖物的绘制层（置顶以保证可见） */
   private overlayLayer = new _Canvas_Axis.Layer({
     name: "creator-layer",
     zIndex: 9999,
   });
   /** 该层内的覆盖物分组，便于统一增删 */
-  private overlayGroup = new _Canvas_Axis.OverlayGroup({ name: "creator-group" });
+  private overlayGroup = new _Canvas_Axis.OverlayGroup({
+    name: "creator-group",
+  });
 
   /** 当前正在创建的覆盖物（多边形或线），其顶点通过 overlay.value 即坐标轴上的值表示 */
   private overlay?: Polygon | Line;
@@ -77,33 +81,33 @@ export default class OverlayCreator {
 
   createLine() {
     this.disableOtherLayerGroups();
-    if (this.overlay) this.overlayGroup.removeOverlays(this.overlay);
+    if (this.overlay) this.overlayGroup.removeOverlay(this.overlay);
     this.axisValueList = [];
     this.overlay = new _Canvas_Axis.Line({});
-    this.overlayGroup.addOverlays(this.overlay);
+    this.overlayGroup.addOverlay(this.overlay);
     return this.overlay;
   }
   createPolygon() {
     this.disableOtherLayerGroups();
-    if (this.overlay) this.overlayGroup.removeOverlays(this.overlay);
+    if (this.overlay) this.overlayGroup.removeOverlay(this.overlay);
     this.axisValueList = [];
     this.overlay = new _Canvas_Axis.Polygon({});
-    this.overlayGroup.addOverlays(this.overlay);
+    this.overlayGroup.addOverlay(this.overlay);
     return this.overlay;
   }
 
   finish?: (overlay?: Polygon | Line) => void;
 
   /** 从创建层中移除指定覆盖物，不传则清空该层全部 */
-  removeOverlays(overlay?: Polygon | Line) {
-    if (overlay) this.overlayGroup.removeOverlays(overlay);
-    else this.overlayGroup.clearOverlays();
+  removeOverlay(overlay?: Polygon | Line) {
+    if (overlay) this.overlayGroup.removeOverlay(overlay);
+    else this.overlayGroup.clearOverlay();
   }
 
   /** 清空创建层并重置当前创建状态 */
   clear() {
     this.restoreLayerGroupsInteractive();
-    this.overlayGroup.clearOverlays();
+    this.overlayGroup.clearOverlay();
     this.overlay = undefined;
     this.axisValueList = undefined;
   }
@@ -178,7 +182,7 @@ export default class OverlayCreator {
       this.overlay.value = this.axisValueList;
       this.finish?.(this.overlay);
     } else {
-      this.overlayGroup.removeOverlays(this.overlay);
+      this.overlayGroup.removeOverlay(this.overlay);
     }
 
     this.overlay = undefined;

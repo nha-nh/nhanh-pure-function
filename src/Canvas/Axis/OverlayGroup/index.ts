@@ -8,6 +8,7 @@ import Polygon from "./polygon";
 import Custom from "./custom";
 import Arc from "./arc";
 import ArcTo from "./arcTo";
+import Billboard from "./billboard";
 // import Ellipse from "./ellipse";
 // import BezierCurve from "./bezierCurve";
 
@@ -20,6 +21,7 @@ export type OverlayType =
   | Arc
   | ArcTo
   | Polygon
+  | Billboard
   | Custom<any>;
 
 export default class OverlayGroup extends EventController {
@@ -43,19 +45,19 @@ export default class OverlayGroup extends EventController {
   setNotifyReload(notifyReload?: () => void) {
     this.notifyReload = notifyReload
       ? (needForceExecute?: boolean) => {
-        if (needForceExecute) this.isRecalculate = true;
-        if (needForceExecute || (this.shouldRender() && this.overlays.size)) {
-          notifyReload();
+          if (needForceExecute) this.isRecalculate = true;
+          if (needForceExecute || (this.shouldRender() && this.overlays.size)) {
+            notifyReload();
+          }
         }
-      }
       : undefined;
 
     this.overlays.forEach((overlay) =>
-      overlay.setNotifyReload(this.notifyReload)
+      overlay.setNotifyReload(this.notifyReload),
     );
   }
   /** 添加覆盖物 */
-  addOverlays(overlays: OverlayType[] | OverlayType) {
+  addOverlay(overlays: OverlayType[] | OverlayType) {
     [overlays].flat().forEach((overlay) => {
       overlay.setNotifyReload(this.notifyReload);
       overlay.setMainCanvas(this.mainCanvas);
@@ -69,7 +71,7 @@ export default class OverlayGroup extends EventController {
     return this.overlays.has(overlay);
   }
   /** 移除覆盖物 */
-  removeOverlays(overlays: OverlayType[] | OverlayType) {
+  removeOverlay(overlays: OverlayType[] | OverlayType) {
     [overlays].flat().forEach((overlay) => {
       this.overlays.delete(overlay);
       overlay.setNotifyReload();
@@ -79,7 +81,7 @@ export default class OverlayGroup extends EventController {
     this.notifyReload?.();
   }
   /** 清空覆盖物 */
-  clearOverlays() {
+  clearOverlay() {
     this.notifyReload?.();
     this.overlays.forEach((overlay) => {
       overlay.setNotifyReload();
@@ -93,7 +95,7 @@ export default class OverlayGroup extends EventController {
   getOverlaysDrawingMethod() {
     const groupArr: [
       number,
-      [(ctx: CanvasRenderingContext2D) => void, OverlayType]
+      [(ctx: CanvasRenderingContext2D) => void, OverlayType],
     ][] = [];
 
     if (this.shouldRender() && this.overlays.size) {

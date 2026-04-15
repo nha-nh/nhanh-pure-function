@@ -15,6 +15,7 @@ import ArcTo from "./OverlayGroup/arcTo";
 import OverlayCreator from "./OverlayCreator";
 import ViewFit from "./public/viewFit";
 import { DeepArray } from "./common.type";
+import Billboard from "./OverlayGroup/billboard";
 // import Ellipse from "./OverlayGroup/ellipse";
 // import BezierCurve from "./OverlayGroup/bezierCurve";
 
@@ -40,7 +41,6 @@ export class _Canvas_Axis extends QuickMethod {
   /** 视图适配工具：默认缩放、居中计算 */
   static ViewFit = ViewFit;
 
-
   /** 图层群组 */
   static LayerGroup = LayerGroup;
   /** 图层 */
@@ -62,6 +62,8 @@ export class _Canvas_Axis extends QuickMethod {
   static Arc = Arc;
   /** 圆角 */
   static ArcTo = ArcTo;
+  /** 图片 */
+  static Billboard = Billboard;
   /** 按坐标轴值创建覆盖物（多边形/线）的交互管理 */
   overlayCreator: OverlayCreator;
 
@@ -78,19 +80,25 @@ export class _Canvas_Axis extends QuickMethod {
   }
 
   private initLayerGroups() {
-    const layer_polygon = new Layer({ name: "多边形图层", zIndex: 1 });
+    const layer_other = new Layer({ name: "其他图层", zIndex: 1 });
+    layer_other.addGroup(new OverlayGroup({ name: "其他覆盖物群组" }));
+
+    const layer_billboard = new Layer({ name: "图片图层", zIndex: 2 });
+    layer_billboard.addGroup(new OverlayGroup({ name: "图片覆盖物群组" }));
+
+    const layer_polygon = new Layer({ name: "多边形图层", zIndex: 3 });
     layer_polygon.addGroup(new OverlayGroup({ name: "多边形覆盖物群组" }));
 
-    const layer_line = new Layer({ name: "线段图层", zIndex: 2 });
+    const layer_line = new Layer({ name: "线段图层", zIndex: 4 });
     layer_line.addGroup(new OverlayGroup({ name: "线段覆盖物群组" }));
 
-    const layer_point = new Layer({ name: "点位图层", zIndex: 3 });
+    const layer_point = new Layer({ name: "点位图层", zIndex: 5 });
     layer_point.addGroup(new OverlayGroup({ name: "点位覆盖物群组" }));
 
-    const layer_text = new Layer({ name: "文字图层", zIndex: 4 });
+    const layer_text = new Layer({ name: "文字图层", zIndex: 6 });
     layer_text.addGroup(new OverlayGroup({ name: "文字覆盖物群组" }));
 
-    const layer_custom = new Layer({ name: "自定义绘制图层", zIndex: 5 });
+    const layer_custom = new Layer({ name: "自定义绘制图层", zIndex: 7 });
     layer_custom.addGroup(new OverlayGroup({ name: "自定义绘制覆盖物群组" }));
 
     const layerGroup = new LayerGroup({ name: "默认图层群组" });
@@ -100,11 +108,11 @@ export class _Canvas_Axis extends QuickMethod {
       layer_line,
       layer_polygon,
       layer_custom,
+      layer_billboard,
+      layer_other,
     ]);
 
     this.setLayerGroup(layerGroup);
-
-
   }
   /** 获取图层群组 集合 */
   gteLayerGroups(key = "默认图层群组") {
@@ -149,20 +157,25 @@ export class _Canvas_Axis extends QuickMethod {
       overlays_line,
       overlays_polygon,
       overlays_custom,
+      overlays_billboard,
+      overlays_other,
     } = this.getDefaultOverlayGroup() || {};
 
     FlattenAll<OverlayType>(overlays).forEach((overlay) => {
-      if (overlay instanceof Text) overlays_text?.addOverlays(overlay);
-      else if (overlay instanceof Point) overlays_point?.addOverlays(overlay);
+      if (overlay instanceof Text) overlays_text?.addOverlay(overlay);
+      else if (overlay instanceof Point) overlays_point?.addOverlay(overlay);
       else if (
         overlay instanceof Line ||
         overlay instanceof Arc ||
         overlay instanceof ArcTo
       )
-        overlays_line?.addOverlays(overlay);
+        overlays_line?.addOverlay(overlay);
       else if (overlay instanceof Polygon)
-        overlays_polygon?.addOverlays(overlay);
-      else if (overlay instanceof Custom) overlays_custom?.addOverlays(overlay);
+        overlays_polygon?.addOverlay(overlay);
+      else if (overlay instanceof Custom) overlays_custom?.addOverlay(overlay);
+      else if (overlay instanceof Billboard)
+        overlays_billboard?.addOverlay(overlay);
+      else overlays_other?.addOverlay(overlay);
     });
   }
   /** 移除覆盖物 */
@@ -173,15 +186,24 @@ export class _Canvas_Axis extends QuickMethod {
       overlays_line,
       overlays_polygon,
       overlays_custom,
+      overlays_billboard,
+      overlays_other,
     } = this.getDefaultOverlayGroup() || {};
     FlattenAll<OverlayType>(overlays).forEach((overlay) => {
-      if (overlay instanceof Text) overlays_text?.removeOverlays(overlay);
-      else if (overlay instanceof Point)
-        overlays_point?.removeOverlays(overlay);
-      else if (overlay instanceof Line) overlays_line?.removeOverlays(overlay);
+      if (overlay instanceof Text) overlays_text?.removeOverlay(overlay);
+      else if (overlay instanceof Point) overlays_point?.removeOverlay(overlay);
+      else if (
+        overlay instanceof Line ||
+        overlay instanceof Arc ||
+        overlay instanceof ArcTo
+      )
+        overlays_line?.removeOverlay(overlay);
       else if (overlay instanceof Polygon)
-        overlays_polygon?.removeOverlays(overlay);
-      else if (overlay instanceof Custom) overlays_custom?.addOverlays(overlay);
+        overlays_polygon?.removeOverlay(overlay);
+      else if (overlay instanceof Custom) overlays_custom?.addOverlay(overlay);
+      else if (overlay instanceof Billboard)
+        overlays_billboard?.removeOverlay(overlay);
+      else overlays_other?.removeOverlay(overlay);
     });
   }
 
@@ -192,4 +214,3 @@ export class _Canvas_Axis extends QuickMethod {
 }
 
 export default _Canvas_Axis;
-

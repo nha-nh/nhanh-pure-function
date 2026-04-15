@@ -114,6 +114,18 @@ export default class Style extends BaseData {
           fill: "#036933",
         },
       },
+      billboard: {
+        stroke: {
+          color: "#d03050",
+          color_hover: "#d03050",
+          width: 4,
+          dash: false,
+          dashGap: [5, 10],
+          dashOffset: 0,
+          cap: "round",
+          join: "round",
+        },
+      },
     },
     dark: {
       background: "#000",
@@ -212,6 +224,18 @@ export default class Style extends BaseData {
           fill: "#7efbd1",
         },
       },
+      billboard: {
+        stroke: {
+          color: "#e88080",
+          color_hover: "#e88080",
+          width: 4,
+          dash: false,
+          dashGap: [5, 10],
+          dashOffset: 0,
+          cap: "round",
+          join: "round",
+        },
+      },
     },
   };
 
@@ -231,8 +255,9 @@ export default class Style extends BaseData {
     canvas.classList.add("_nhanh_canvas");
 
     const style = this.style[theme];
-    ctx.font = `${style.text.bold ? "bold" : ""} ${style.text.size}px ${style.text.family
-      }`;
+    ctx.font = `${style.text.bold ? "bold" : ""} ${style.text.size}px ${
+      style.text.family
+    }`;
   }
   /** 清除画布 */
   clearScreen(fillBackground = true) {
@@ -254,7 +279,7 @@ export default class Style extends BaseData {
     for (const key in style) {
       if (Object.prototype.hasOwnProperty.call(style, key)) {
         const oldStyle = _Utility_Clone(
-          this.style[key] || this.style[this.theme]
+          this.style[key] || this.style[this.theme],
         );
         _Utility_MergeObjects(oldStyle, style[key]);
         this.style[key] = oldStyle as StyleItemType;

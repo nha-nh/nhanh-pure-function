@@ -194,15 +194,15 @@ export default abstract class Overlay<
   setNotifyReload(notifyReload?: () => void) {
     this.notifyReload = notifyReload
       ? (needForceExecute?: boolean) => {
-        if (needForceExecute) this.isRecalculate = true;
+          if (needForceExecute) this.isRecalculate = true;
 
-        /** 确认当前覆盖物需要渲染 */
-        if (needForceExecute || this.isNeedRender) notifyReload();
+          /** 确认当前覆盖物需要渲染 */
+          if (needForceExecute || this.isNeedRender) notifyReload();
           /** 上一帧时当前覆盖物若已渲染，通知原因（清除当前覆盖物） */ else if (
-          this.mainCanvas?.currentDrawOverlays.includes(this as any)
-        )
-          notifyReload();
-      }
+            this.mainCanvas?.currentDrawOverlays.includes(this as any)
+          )
+            notifyReload();
+        }
       : undefined;
   }
 
@@ -220,11 +220,11 @@ export default abstract class Overlay<
   private set valueScope(
     value:
       | {
-        minX: number;
-        maxX: number;
-        minY: number;
-        maxY: number;
-      }
+          minX: number;
+          maxX: number;
+          minY: number;
+          maxY: number;
+        }
       | undefined,
   ) {
     this._valueScope = value;
@@ -353,11 +353,11 @@ export default abstract class Overlay<
   protected setFixedExtraScope(
     value?:
       | {
-        topV: number;
-        bottomV: number;
-        leftV: number;
-        rightV: number;
-      }
+          topV: number;
+          bottomV: number;
+          leftV: number;
+          rightV: number;
+        }
       | true,
   ) {
     if (value === true) {
@@ -407,11 +407,11 @@ export default abstract class Overlay<
   protected setExtraScope(
     value?:
       | {
-        top: number;
-        bottom: number;
-        left: number;
-        right: number;
-      }
+          top: number;
+          bottom: number;
+          left: number;
+          right: number;
+        }
       | true,
   ) {
     const { valueScope, mainCanvas, extraScope } = this;
@@ -466,11 +466,11 @@ export default abstract class Overlay<
 
     return valueScope
       ? !(
-        maxMinValue.maxXV < valueScope.minX ||
-        maxMinValue.minXV > valueScope.maxX ||
-        maxMinValue.maxYV < valueScope.minY ||
-        maxMinValue.minYV > valueScope.maxY
-      )
+          maxMinValue.maxXV < valueScope.minX ||
+          maxMinValue.minXV > valueScope.maxX ||
+          maxMinValue.maxYV < valueScope.minY ||
+          maxMinValue.minYV > valueScope.maxY
+        )
       : true;
   }
   /** 判断是否需要渲染 */

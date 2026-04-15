@@ -13,6 +13,7 @@ import type OverlayCreatorByAxisValue from "./OverlayCreator";
 import type ViewFit from "./public/viewFit";
 import type { EventHandler } from "./public/eventController";
 import type Overlay from "./OverlayGroup/public/overlay";
+import type Billboard from "./OverlayGroup/billboard";
 // import type  Ellipse from "./OverlayGroup/ellipse";
 // import type  BezierCurve from "./OverlayGroup/bezierCurve";
 
@@ -46,6 +47,7 @@ export type {
   Custom,
   Arc,
   ArcTo,
+  Billboard,
   OverlayCreatorByAxisValue,
   ViewFit,
   // Ellipse,
