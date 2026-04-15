@@ -39,6 +39,12 @@ export default class Layer extends EventController {
   private isReload = false;
 
   groups = new Map<string, OverlayGroup>();
+  private oldGroupsSize = 0;
+  private get groupsSizeChange() {
+    const oldSize = this.oldGroupsSize;
+    this.oldGroupsSize = this.groups.size;
+    return this.groups.size !== oldSize;
+  }
 
   constructor(option: ConstructorOption) {
     super(option);
@@ -60,11 +66,15 @@ export default class Layer extends EventController {
   setNotifyReload(notifyReload?: () => void) {
     this.notifyReload = notifyReload
       ? (needForceExecute) => {
-        if (needForceExecute) this.isRecalculate = true;
-        if (needForceExecute || (this.shouldRender() && this.groups.size)) {
-          notifyReload();
+          if (needForceExecute) this.isRecalculate = true;
+          if (
+            needForceExecute ||
+            this.groupsSizeChange ||
+            (this.shouldRender() && this.groups.size)
+          ) {
+            notifyReload();
+          }
         }
-      }
       : undefined;
 
     this.groups.forEach((group) => this.setGroupNotifyReload(group));
@@ -73,9 +83,9 @@ export default class Layer extends EventController {
     group.setNotifyReload(
       this.notifyReload
         ? () => {
-          this.notifyReload?.();
-          this.isReload = true;
-        }
+            this.notifyReload?.();
+            this.isReload = true;
+          }
         : undefined,
     );
   }

@@ -9,7 +9,12 @@ type ConstructorOption = ConstructorParameters<typeof EventController>[0];
 export default class LayerGroup extends EventController {
   /** 图层群组 */
   layers = new Map<string, Layer>();
-
+  private oldLlayersSize = 0;
+  private get layersSizeChange() {
+    const oldSize = this.oldLlayersSize;
+    this.oldLlayersSize = this.layers.size;
+    return this.layers.size !== oldSize;
+  }
   constructor(option: ConstructorOption) {
     super(option);
 
@@ -53,7 +58,11 @@ export default class LayerGroup extends EventController {
       ? (needForceExecute) => {
           if (needForceExecute) this.isRecalculate = true;
 
-          if (needForceExecute || (this.shouldRender() && this.layers.size)) {
+          if (
+            needForceExecute ||
+            this.layersSizeChange ||
+            (this.shouldRender() && this.layers.size)
+          ) {
             notifyReload();
           }
         }

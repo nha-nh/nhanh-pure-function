@@ -27,6 +27,12 @@ export type OverlayType =
 export default class OverlayGroup extends EventController {
   /** 覆盖物集合 */
   overlays = new Set<OverlayType>();
+  private oldOverlaysSize = 0;
+  private get overlaysSizeChange() {
+    const oldSize = this.oldOverlaysSize;
+    this.oldOverlaysSize = this.overlays.size;
+    return this.overlays.size !== oldSize;
+  }
 
   constructor(option: ConstructorOption) {
     super(option);
@@ -46,7 +52,11 @@ export default class OverlayGroup extends EventController {
     this.notifyReload = notifyReload
       ? (needForceExecute?: boolean) => {
           if (needForceExecute) this.isRecalculate = true;
-          if (needForceExecute || (this.shouldRender() && this.overlays.size)) {
+          if (
+            needForceExecute ||
+            this.overlaysSizeChange ||
+            (this.shouldRender() && this.overlays.size)
+          ) {
             notifyReload();
           }
         }
