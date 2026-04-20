@@ -33,7 +33,7 @@ export default class Draw extends Style {
             this.rect.height,
           ];
           this.redrawOnce();
-        }, 200)
+        }, 200),
       );
       this.resizeObserver.observe(this.canvas);
     }
@@ -70,7 +70,7 @@ export default class Draw extends Style {
     if (!this.canvas) return console.warn("canvas is not HTMLCanvasElement");
     if (this.canvas.clientWidth == 0 || this.canvas.clientHeight == 0)
       return console.warn(
-        "The image argument is a canvas element with a width or height of 0."
+        "The image argument is a canvas element with a width or height of 0.",
       );
 
     if (!this.shouldRender()) return this.clearScreen(false);
@@ -90,14 +90,14 @@ export default class Draw extends Style {
     let canvasArr: [
       number,
       HTMLCanvasElement,
-      [[number, number], OverlayType][]
+      [[number, number], OverlayType][],
     ][] = [];
 
     const axis_canvas = this.drawAxis?.drawAxisAndGrid();
     if (axis_canvas) canvasArr.push([0, axis_canvas, []]);
 
     this.layerGroups.forEach((layerGroup) =>
-      canvasArr.push(...layerGroup.fetchCanvas())
+      canvasArr.push(...layerGroup.fetchCanvas()),
     );
     canvasArr.sort((a, b) => a[0] - b[0]);
 
@@ -116,7 +116,7 @@ export default class Draw extends Style {
     currentDrawOverlays.sort(
       (
         [[aLayerZIndex, aOverlayZIndex], aOverlay],
-        [[bLayerZIndex, bOverlayZIndex], bOverlay]
+        [[bLayerZIndex, bOverlayZIndex], bOverlay],
       ) => {
         // 再比较图层 z-index
         if (aLayerZIndex !== bLayerZIndex) return bLayerZIndex - aLayerZIndex;
@@ -141,12 +141,12 @@ export default class Draw extends Style {
         };
 
         return getPriority(bOverlay) - getPriority(aOverlay);
-      }
+      },
     );
 
     // 将分组结果转换为 Overlay[] 结构
     this.currentDrawOverlays = currentDrawOverlays.map(
-      ([, overlay]) => overlay
+      ([, overlay]) => overlay,
     );
 
     // console.log("本次绘制的覆盖物数量： ", this.currentDrawOverlays.length);
@@ -172,7 +172,7 @@ export default class Draw extends Style {
         [0.5, "#E6A23C"],
         [0, "#67C23A"],
       ],
-    }
+    },
   );
 
   /** 重绘画布 同一个渲染帧只会执行一次 */
@@ -242,7 +242,7 @@ export default class Draw extends Style {
         .sort(
           (a, b) =>
             (a.isDraggable && a.isClick ? 0 : 1) -
-            (b.isDraggable && b.isClick ? 0 : 1)
+            (b.isDraggable && b.isClick ? 0 : 1),
         )
         .find((overlay) => {
           const valueScope = overlay.valueScope;

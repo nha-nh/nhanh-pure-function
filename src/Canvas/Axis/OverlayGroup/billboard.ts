@@ -138,10 +138,9 @@ abstract class BillboardBase extends Overlay<
     };
   }
 
-  private loadImage() {
-    this.ready = false;
+  constructor(option: ConstructorOption) {
+    super(option);
 
-    if (!this.url) return;
     this.image.onload = () => {
       this.ready = true;
     };
@@ -149,13 +148,13 @@ abstract class BillboardBase extends Overlay<
       this.ready = false;
       console.error("图片加载失败");
     };
-    this.image.src = this.url;
   }
 
   protected updateBaseData() {
     if (!this.mainCanvas) return;
 
-    this.loadImage();
+    this.ready = false;
+    if (this.url) this.image.src = this.url;
 
     this.handleValuePosition("array2D", 1);
   }

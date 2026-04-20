@@ -235,11 +235,14 @@ export default abstract class GeometricBoundary<T> extends Overlay<
         ];
       });
       this.handlePoints.forEach((point, index) => {
-        point.internalUpdate({
-          value: this.value![index],
-          position: this.position![index],
-          dynamicPosition: this.dynamicPosition![index],
-        });
+        point.internalUpdate(
+          {
+            value: this.value![index],
+            position: this.position![index],
+            dynamicPosition: this.dynamicPosition![index],
+          },
+          true,
+        );
       });
       this.lockedCanCreateOrDeleteHandlePoint = true;
     };

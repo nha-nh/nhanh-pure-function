@@ -43,7 +43,7 @@ export default class Point extends Overlay<PointStyleType, [number, number]> {
           _Number.add(this.dynamicPosition![1], y.dynamicPosition),
         ],
       },
-      true
+      true,
     );
 
     this.notifyReload?.();
@@ -67,7 +67,7 @@ export default class Point extends Overlay<PointStyleType, [number, number]> {
       this.cancelAndRestartAnimation(
         isHover,
         defaultLineWidth,
-        animationDuration - 100
+        animationDuration - 100,
       );
     }
     // 处理新的悬停动画
@@ -80,7 +80,7 @@ export default class Point extends Overlay<PointStyleType, [number, number]> {
   private cancelAndRestartAnimation(
     isHover: boolean,
     defaultLineWidth: number,
-    duration: number
+    duration: number,
   ) {
     this.fillProgress!.scheduleCallback(); // 取消当前动画
 
@@ -96,7 +96,7 @@ export default class Point extends Overlay<PointStyleType, [number, number]> {
       // 限制进度在0-1之间
       this.fillProgress.progress = Math.min(
         1,
-        Math.max(0, this.fillProgress.progress)
+        Math.max(0, this.fillProgress.progress),
       );
 
       // 计算并更新线宽偏移
