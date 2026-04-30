@@ -1,6 +1,6 @@
 {
   "name": "nhanh-pure-function",
-  "version": "4.2.3",
+  "version": "4.2.4",
   "description": "纯函数工具",
   "main": "./dist/index.cjs.js",
   "module": "./dist/index.es.js",
