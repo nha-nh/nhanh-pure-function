@@ -17,6 +17,30 @@ export function _File_Read(src: string): Promise<string> {
 }
 
 /**
+ * 选择文件
+ * @param options 选择文件的配置
+ * @returns 选择的文件列表
+ */
+export function _File_Select(options?: {
+  accept?: string;
+  multiple?: boolean;
+}): Promise<File[]> {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = options?.accept || "";
+  input.multiple = options?.multiple || false;
+
+  return new Promise((resolve, reject) => {
+    input.addEventListener("change", (event) => {
+      const files = (event.target as HTMLInputElement).files;
+      if (files) resolve(Array.from(files));
+      else reject();
+    });
+    input.click();
+  });
+}
+
+/**
  * 下载文件并支持进度监控、超时控制和主动中止
  *
  * @param {Object} options - 下载配置选项
@@ -151,7 +175,7 @@ export function _File_Download(options: {
 export function _File_CreateAndDownload(
   content: BlobPart[],
   fileName: string,
-  options?: BlobPropertyBag
+  options?: BlobPropertyBag,
 ) {
   if (!options) {
     let type = fileName.replace(/^[^.]+./, "");
