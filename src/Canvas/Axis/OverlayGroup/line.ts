@@ -59,7 +59,7 @@ export default class Line extends GeometricBoundary<LineStyleType> {
       if (!allow) return false;
       let point_hover = false;
       const handlePoints = [...this.handlePoints].sort(
-        (a, b) => (a.isHover ? 0 : 1) - (b.isHover ? 0 : 1)
+        (a, b) => (a.isHover ? 0 : 1) - (b.isHover ? 0 : 1),
       );
       handlePoints.forEach((point) => {
         if (point_hover) {
@@ -87,7 +87,7 @@ export default class Line extends GeometricBoundary<LineStyleType> {
         [0, 0],
         [width, height],
         this.finalDynamicPosition[0],
-        this.finalDynamicPosition[1]
+        this.finalDynamicPosition[1],
       );
     }
     return super.isWithinRange;
@@ -116,7 +116,7 @@ export default class Line extends GeometricBoundary<LineStyleType> {
     } else if (typeof this.style == "object") {
       style = _Utility_MergeObjects(
         JSON.parse(JSON.stringify(defaultStyle)),
-        this.style
+        this.style,
       );
     } else {
       style = defaultStyle;
@@ -180,13 +180,13 @@ export default class Line extends GeometricBoundary<LineStyleType> {
       start,
       [-dirVector[0], -dirVector[1]],
       rect.width,
-      rect.height
+      rect.height,
     );
     const extendedEnd = _GetBoundaryIntersection(
       end,
       dirVector,
       rect.width,
-      rect.height
+      rect.height,
     );
 
     // 绘制最终线段
@@ -311,7 +311,7 @@ function _GetBoundaryIntersection(
   startPoint: [number, number],
   direction: [number, number],
   canvasWidth: number,
-  canvasHeight: number
+  canvasHeight: number,
 ): [number, number] {
   const [startX, startY] = startPoint;
   const [dirX, dirY] = direction;
@@ -359,7 +359,7 @@ function _DoesInfiniteLineIntersectRectangle(
   rectCorner1: [number, number],
   rectCorner2: [number, number],
   linePointA: [number, number],
-  linePointB: [number, number]
+  linePointB: [number, number],
 ): boolean {
   // 计算矩形边界范围
   const rectMinX = Math.min(rectCorner1[0], rectCorner2[0]);

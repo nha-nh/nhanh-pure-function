@@ -36,10 +36,10 @@ export default class Text extends Overlay<TextStyleType, [number, number]> {
     const { text } = option;
     Object.assign(this, { text });
 
-    this.addEventListener("dragg", this.defaultDragg);
+    this.addEventListener("drag", this.defaultDrag);
   }
 
-  defaultDragg: EventHandler<"dragg"> = (event, mouseEvent) => {
+  defaultDrag: EventHandler<"drag"> = (event, mouseEvent) => {
     const { offsetX, offsetY } = event.data;
     const { x, y } = this.calculateOffset(offsetX, offsetY);
 
@@ -58,7 +58,7 @@ export default class Text extends Overlay<TextStyleType, [number, number]> {
           _Number.add(this.dynamicPosition![1], y.dynamicPosition),
         ],
       },
-      true
+      true,
     );
 
     this.notifyReload?.();
@@ -150,7 +150,7 @@ export default class Text extends Overlay<TextStyleType, [number, number]> {
       x,
       finalDynamicPosition[1] - textOffset.y,
       textOffset.x * 2,
-      textOffset.y * 2
+      textOffset.y * 2,
     );
   }
   getDraw(): [(ctx: CanvasRenderingContext2D) => void, OverlayType] | void {
@@ -185,7 +185,7 @@ function drawWrappedText(
   x: number,
   y: number,
   maxWidth: number,
-  lineSpacing = 1.1 // 行间距倍数（1.1表示增加10%间距）
+  lineSpacing = 1.1, // 行间距倍数（1.1表示增加10%间距）
 ) {
   if (!text) return;
 

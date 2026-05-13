@@ -38,6 +38,13 @@ abstract class Base<T extends Base<T>> {
   notifyReload?: (needForceExecute?: boolean) => void;
   /** 设置通知重新加载 */
   abstract setNotifyReload(notifyReload?: () => void): void;
+
+  /** 移除某子项 */
+  abstract removeChild(child: Base<any>): void;
+  /** 从父级移除自身 */
+  remove() {
+    this.parent?.removeChild(this);
+  }
 }
 abstract class Show<T extends Show<T>> extends Base<T> {
   private _isVisible = true;
@@ -58,7 +65,7 @@ abstract class Show<T extends Show<T>> extends Base<T> {
   /** 透明度 */
   get opacity() {
     return this.inheritOpacity
-      ? this._opacity ?? this.parent?.opacity
+      ? (this._opacity ?? this.parent?.opacity)
       : this._opacity;
   }
   set opacity(opacity: number | undefined) {

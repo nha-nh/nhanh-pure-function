@@ -122,6 +122,9 @@ export default class BaseData extends EventController {
   /** 图层群组 集合 */
   layerGroups = new Map<string, LayerGroup>();
 
+  /** 占位，由子类实现 */
+  removeChild(child: LayerGroup): void {}
+
   constructor(option: ConstructorOption) {
     super(option);
 

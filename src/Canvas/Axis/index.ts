@@ -137,6 +137,9 @@ export class _Canvas_Axis extends QuickMethod {
       this.redrawOnce();
     }
   }
+  removeChild(layerGroup: LayerGroup): void {
+    this.removeLayerGroup(layerGroup);
+  }
   /** 添加图层 */
   addLayer(layers: DeepArray<Layer>) {
     const layerGroup = this.layerGroups.get("默认图层群组");
@@ -145,9 +148,7 @@ export class _Canvas_Axis extends QuickMethod {
   }
   /** 移除图层 */
   removeLayer(layers: DeepArray<Layer>) {
-    const layerGroup = this.layerGroups.get("默认图层群组");
-    if (!layerGroup) return;
-    layerGroup.removeLayer(FlattenAll(layers));
+    FlattenAll<Layer>(layers).forEach((layer) => layer.remove());
   }
   /** 添加覆盖物 */
   addOverlay(overlays: DeepArray<OverlayType>) {
@@ -180,31 +181,7 @@ export class _Canvas_Axis extends QuickMethod {
   }
   /** 移除覆盖物 */
   removeOverlay(overlays: DeepArray<OverlayType>) {
-    const {
-      overlays_text,
-      overlays_point,
-      overlays_line,
-      overlays_polygon,
-      overlays_custom,
-      overlays_billboard,
-      overlays_other,
-    } = this.getDefaultOverlayGroup() || {};
-    FlattenAll<OverlayType>(overlays).forEach((overlay) => {
-      if (overlay instanceof Text) overlays_text?.removeOverlay(overlay);
-      else if (overlay instanceof Point) overlays_point?.removeOverlay(overlay);
-      else if (
-        overlay instanceof Line ||
-        overlay instanceof Arc ||
-        overlay instanceof ArcTo
-      )
-        overlays_line?.removeOverlay(overlay);
-      else if (overlay instanceof Polygon)
-        overlays_polygon?.removeOverlay(overlay);
-      else if (overlay instanceof Custom) overlays_custom?.addOverlay(overlay);
-      else if (overlay instanceof Billboard)
-        overlays_billboard?.removeOverlay(overlay);
-      else overlays_other?.removeOverlay(overlay);
-    });
+    FlattenAll<OverlayType>(overlays).forEach((overlay) => overlay.remove());
   }
 
   /** 销毁 */

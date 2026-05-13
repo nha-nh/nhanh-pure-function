@@ -100,6 +100,10 @@ export default class OverlayGroup extends EventController {
     });
     this.overlays.clear();
   }
+  /** 移除覆盖物 */
+  removeChild(child: OverlayType) {
+    this.removeOverlay(child);
+  }
 
   /** 获取覆盖物的绘制方法 */
   getOverlaysDrawingMethod() {

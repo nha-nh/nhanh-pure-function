@@ -21,7 +21,7 @@ type EventControllerOptions<T extends EventControllerBasedata<T>> =
   };
 
 export default abstract class EventControllerBasedata<
-  T extends EventControllerBasedata<T>
+  T extends EventControllerBasedata<T>,
 > extends BaseData<T> {
   private _isInteractive = true;
   /** 是否可以触发交互事件 */
@@ -104,7 +104,7 @@ export default abstract class EventControllerBasedata<
   private getPropValue(
     parentProp: keyof T,
     ownValue: boolean,
-    checkInteractive = true
+    checkInteractive = true,
   ): boolean {
     const parentValue = this.parent
       ? (this.parent[parentProp] as boolean)

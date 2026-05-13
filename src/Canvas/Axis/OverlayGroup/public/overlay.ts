@@ -610,4 +610,7 @@ export default abstract class Overlay<
   abstract getDraw():
     | [(ctx: CanvasRenderingContext2D) => void, OverlayType]
     | void;
+
+  /** 占位，无实际意义 */
+  removeChild() {}
 }

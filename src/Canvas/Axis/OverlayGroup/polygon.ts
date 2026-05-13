@@ -95,7 +95,7 @@ export default class Polygon extends GeometricBoundary<PolygonStyleType> {
       if (!allow) return false;
       let point_hover = false;
       const handlePoints = [...this.handlePoints].sort(
-        (a, b) => (a.isHover ? 0 : 1) - (b.isHover ? 0 : 1)
+        (a, b) => (a.isHover ? 0 : 1) - (b.isHover ? 0 : 1),
       );
       handlePoints.forEach((point) => {
         if (point_hover) {
@@ -132,7 +132,7 @@ export default class Polygon extends GeometricBoundary<PolygonStyleType> {
 
     // 3. 处理数组类型半径
     this.dynamicBorderRadius = borderRadius.map((v) =>
-      this.handleSingleRadius(v, true)
+      this.handleSingleRadius(v, true),
     );
   }
   private handleSingleRadius(radius: number): number | undefined;
@@ -140,7 +140,7 @@ export default class Polygon extends GeometricBoundary<PolygonStyleType> {
   /** 处理单个半径值转换 */
   private handleSingleRadius(
     radius: number,
-    allowZero?: boolean
+    allowZero?: boolean,
   ): number | undefined {
     const { mainCanvas, borderRadiusType } = this;
 
@@ -183,7 +183,7 @@ export default class Polygon extends GeometricBoundary<PolygonStyleType> {
     } else if (typeof this.style == "object") {
       style = _Utility_MergeObjects(
         JSON.parse(JSON.stringify(defaultStyle)),
-        this.style
+        this.style,
       );
     } else {
       style = defaultStyle;

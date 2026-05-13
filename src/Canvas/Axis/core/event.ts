@@ -63,7 +63,18 @@ export default class Event extends Draw {
   }
 
   /** 上一个被点击的覆盖物 */
-  private lastClickedOverlay?: OverlayType;
+  private _lastClickedOverlay?: OverlayType;
+  /** 上一个被点击的覆盖物 */
+  get lastClickedOverlay() {
+    if (this._lastClickedOverlay) {
+      const isEquals = this._lastClickedOverlay.equalsMainCanvas(this as any);
+      if (!isEquals) this._lastClickedOverlay = undefined;
+    }
+    return this._lastClickedOverlay;
+  }
+  private set lastClickedOverlay(overlay: OverlayType | undefined) {
+    this._lastClickedOverlay = overlay;
+  }
   private lockNotifyClick = false;
   /** 鼠标左键点击画布 */
   private click(event: MouseEvent) {
@@ -242,7 +253,19 @@ export default class Event extends Draw {
     this.redrawOnce();
   };
   /** 上一个被按下的覆盖物 */
-  private lastDownOverlay?: OverlayType;
+  private _lastDownOverlay?: OverlayType;
+  /** 上一个被按下的覆盖物 */
+  get lastDownOverlay() {
+    if (this._lastDownOverlay) {
+      const isEquals = this._lastDownOverlay.equalsMainCanvas(this as any);
+      if (!isEquals) this._lastDownOverlay = undefined;
+    }
+    return this._lastDownOverlay;
+  }
+  private set lastDownOverlay(overlay: OverlayType | undefined) {
+    this._lastDownOverlay = overlay;
+  }
+
   /** 鼠标按下 */
   private mousedown(event: MouseEvent) {
     if (!this.isDownable) return;
@@ -271,7 +294,18 @@ export default class Event extends Draw {
   }
 
   /** 上一个被hover的覆盖物 */
-  private lastHoverOverlay?: OverlayType;
+  private _lastHoverOverlay?: OverlayType;
+  /** 上一个被hover的覆盖物 */
+  private get lastHoverOverlay() {
+    if (this._lastHoverOverlay) {
+      const isEquals = this._lastHoverOverlay.equalsMainCanvas(this as any);
+      if (!isEquals) this._lastHoverOverlay = undefined;
+    }
+    return this._lastHoverOverlay;
+  }
+  private set lastHoverOverlay(overlay: OverlayType | undefined) {
+    this._lastHoverOverlay = overlay;
+  }
   /** 鼠标移动 */
   private mousemove(event: MouseEvent) {
     if (this.isAuto) return;
@@ -298,7 +332,7 @@ export default class Event extends Draw {
     const { lastDownOverlay } = this;
 
     if (lastDownOverlay?.isDraggable) {
-      this.notifyDraggOverlays(event);
+      this.notifyDragOverlays(event);
     } else {
       this.handleCanvasPan(event);
     }
@@ -307,17 +341,17 @@ export default class Event extends Draw {
     this.lockNotifyClick = true;
   }
   /** 通知可拖拽的 overlays */
-  private notifyDraggOverlays(event: MouseEvent) {
+  private notifyDragOverlays(event: MouseEvent) {
     const lastDownOverlay = this.lastDownOverlay!;
     const { mouseLastPosition } = this;
     const { clientX, clientY } = event;
 
-    lastDownOverlay.notifyDragg(
+    lastDownOverlay.notifyDrag(
       {
         offsetX: clientX - mouseLastPosition.x,
         offsetY: clientY - mouseLastPosition.y,
       },
-      event
+      event,
     );
   }
   /** 处理画布平移 */
@@ -331,7 +365,7 @@ export default class Event extends Draw {
     offset.x += offsetX;
     offset.y += offsetY;
     this.redrawOnce();
-    this.notifyDragg({ offsetX, offsetY }, event);
+    this.notifyDrag({ offsetX, offsetY }, event);
   }
   /** 处理 hover 逻辑 */
   private handleHover(event: MouseEvent) {
@@ -350,7 +384,7 @@ export default class Event extends Draw {
   /** 更新 hover 状态 */
   private updateHoverState(
     hoverOverlay: OverlayType | undefined,
-    event: MouseEvent
+    event: MouseEvent,
   ) {
     if (this.lastHoverOverlay === hoverOverlay) {
       const cursorStyle = hoverOverlay?.cursorStyle;
@@ -425,25 +459,25 @@ export default class Event extends Draw {
             oldClientX[0],
             oldClientY[0],
             oldClientX[1],
-            oldClientY[1]
+            oldClientY[1],
           );
           const newDistance = _Math_CalculateDistance2D(
             clientX1,
             clientY1,
             clientX2,
-            clientY2
+            clientY2,
           );
 
           const { x: clientX, y: clientY } = _Math_GetMidpoint(
             clientX1,
             clientY1,
             clientX2,
-            clientY2
+            clientY2,
           );
 
           this.setScale(
             { clientX, clientY },
-            newDistance > oldDistance ? delta : -delta
+            newDistance > oldDistance ? delta : -delta,
           );
           this.redrawOnce();
         }

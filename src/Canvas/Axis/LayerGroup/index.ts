@@ -27,7 +27,7 @@ export default class LayerGroup extends EventController {
     this.addEventListener("click", this.defaultClick);
     this.addEventListener("doubleClick", this.defaultDoubleClick);
     this.addEventListener("hover", this.defaultHover);
-    this.addEventListener("dragg", this.defaultDragg);
+    this.addEventListener("drag", this.defaultDrag);
     this.addEventListener("down", this.defaultDown);
   }
 
@@ -40,7 +40,7 @@ export default class LayerGroup extends EventController {
     event.stopPropagation();
   defaultHover: EventHandler<"hover"> = (event, mouseEvent) =>
     event.stopPropagation();
-  defaultDragg: EventHandler<"dragg"> = (event, mouseEvent) =>
+  defaultDrag: EventHandler<"drag"> = (event, mouseEvent) =>
     event.stopPropagation();
   defaultDown: EventHandler<"down"> = (event, mouseEvent) =>
     event.stopPropagation();
@@ -111,6 +111,10 @@ export default class LayerGroup extends EventController {
       this.layers.clear();
       this.notifyReload?.();
     }
+  }
+  /** 移除图层 */
+  removeChild(child: Layer) {
+    this.removeLayer(child);
   }
 
   /** 收集图层的 canvas */

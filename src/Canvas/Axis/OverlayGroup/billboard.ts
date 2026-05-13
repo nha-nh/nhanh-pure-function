@@ -167,10 +167,10 @@ export default class Billboard extends BillboardBase {
     const { url, objectFit } = option;
     Object.assign(this, { url, objectFit });
 
-    this.addEventListener("dragg", this.defaultDragg);
+    this.addEventListener("drag", this.defaultDrag);
   }
 
-  defaultDragg: EventHandler<"dragg"> = (event, mouseEvent) => {
+  defaultDrag: EventHandler<"drag"> = (event, mouseEvent) => {
     const { offsetX, offsetY } = event.data;
     const { x, y } = this.calculateOffset(offsetX, offsetY);
 

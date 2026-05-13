@@ -183,7 +183,7 @@ export default class Arc extends Overlay<ArcStyleType, [number, number]> {
     });
 
     this.addEventListener("click", this.defaultClick);
-    this.addEventListener("dragg", this.defaultDragg);
+    this.addEventListener("drag", this.defaultDrag);
   }
 
   /** 默认点击事件 点击后切换控制点显示状态 */
@@ -195,7 +195,7 @@ export default class Arc extends Overlay<ArcStyleType, [number, number]> {
     if (state != oldState) this.notifyReload?.();
   };
   /** 处理拖动状态变化 */
-  defaultDragg: EventHandler<"dragg"> = (event, mouseEvent) => {
+  defaultDrag: EventHandler<"drag"> = (event, mouseEvent) => {
     if (!this.mainCanvas) return;
 
     /** 移动整体 */

@@ -131,6 +131,10 @@ export default class Layer extends EventController {
       this.notifyReload?.();
     }
   }
+  /** 移除覆盖物组 */
+  removeChild(child: OverlayGroup) {
+    this.removeGroup(child);
+  }
 
   /** 本次绘制的覆盖物 */
   private currentDrawOverlays: [[number, number], OverlayType][] = [];

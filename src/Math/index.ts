@@ -12,7 +12,7 @@ const MAX_LAT = 85.05112878;
  */
 export function _Math_LngLatToPlane(
   lng: number,
-  lat: number
+  lat: number,
 ): [number, number] {
   const clampedLng = Math.max(Math.min(lng, 180), -180);
   const clampedLat = Math.max(Math.min(lat, MAX_LAT), -MAX_LAT);
@@ -50,7 +50,7 @@ export function _Math_PlaneToLngLat(x: number, y: number): [number, number] {
 export function _Math_PointToLineDistance(
   point: [number, number],
   lineStart: [number, number],
-  lineEnd: [number, number]
+  lineEnd: [number, number],
 ): number {
   const [x0, y0] = point;
   const [x1, y1] = lineStart;
@@ -63,7 +63,7 @@ export function _Math_PointToLineDistance(
   t = Math.max(0, Math.min(1, t));
 
   return Math.sqrt(
-    (x0 - (x1 + t * (x2 - x1))) ** 2 + (y0 - (y1 + t * (y2 - y1))) ** 2
+    (x0 - (x1 + t * (x2 - x1))) ** 2 + (y0 - (y1 + t * (y2 - y1))) ** 2,
   );
 }
 
@@ -85,7 +85,7 @@ export function _Math_GetArcPoints(
   startAngle: number,
   endAngle: number,
   axisX: number = 1,
-  axisY: number = 1
+  axisY: number = 1,
 ): [[number, number], [number, number]] {
   // 计算起点坐标（考虑坐标轴方向）
   const startX = x + radius * Math.cos(startAngle) * axisX;
@@ -106,7 +106,7 @@ export function _Math_CalculateDistance2D(
   x1: number,
   y1: number,
   x2: number,
-  y2: number
+  y2: number,
 ) {
   return Math.hypot(Math.abs(x2 - x1), Math.abs(y2 - y1));
 }
@@ -116,7 +116,7 @@ export function _Math_GetMidpoint(
   x1: number,
   y1: number,
   x2: number,
-  y2: number
+  y2: number,
 ) {
   const midX = (x1 + x2) / 2;
   const midY = (y1 + y2) / 2;
@@ -135,7 +135,7 @@ export function _Math_GetBoundaryIntersection(
   startPoint: [number, number],
   direction: [number, number],
   canvasWidth: number,
-  canvasHeight: number
+  canvasHeight: number,
 ): [number, number] {
   const [startX, startY] = startPoint;
   const [dirX, dirY] = direction;
@@ -212,3 +212,32 @@ export const _Math_Degree = new Proxy(Math, {
     throw new Error("DegreeMath 是只读的，不能删除属性");
   },
 });
+
+/**
+ * 根据控制点与参数 t，用 De Casteljau 计算 Bézier 曲线上的点。
+ * @param nodes 控制点
+ * @param progress 曲线参数，通常取 [0, 1]
+ * @returns 曲线上的点
+ */
+export function _Math_GetBezierCurveNodes(
+  nodes: [number, number][],
+  progress: number,
+): [number, number] {
+  const n = nodes.length;
+  if (n === 0) return [0, 0];
+  if (n === 1) return [nodes[0][0], nodes[0][1]];
+
+  const t = progress;
+  let layer: [number, number][] = nodes.map((p) => [p[0], p[1]]);
+  while (layer.length > 1) {
+    const next: [number, number][] = [];
+    for (let i = 0; i < layer.length - 1; i++) {
+      next.push([
+        (1 - t) * layer[i][0] + t * layer[i + 1][0],
+        (1 - t) * layer[i][1] + t * layer[i + 1][1],
+      ]);
+    }
+    layer = next;
+  }
+  return layer[0];
+}

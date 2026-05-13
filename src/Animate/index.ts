@@ -6,7 +6,7 @@
  */
 export function _Animate_Schedule(
   callback: (schedule: number) => void,
-  TIME = 500
+  TIME = 500,
 ) {
   let t: number;
   let canContinueExecution = true;
@@ -27,7 +27,7 @@ export function _Animate_Schedule(
  * @param initialMax - 振荡器初始最大值
  * @param initialSteps - 从最小值到最大值所需的动画步数
  * @param callback - 每帧更新时的回调函数，接收当前振荡值
- * @param precision - 数值精度（保留小数位数，默认2位）
+ * @param precision - 数值精度（保留小数位数，默认4位）
  * @returns 振荡器控制对象，包含播放/暂停/参数更新等方法
  */
 export function _Animate_CreateOscillator(
@@ -35,7 +35,7 @@ export function _Animate_CreateOscillator(
   initialMax: number,
   initialSteps: number,
   callback: (value: number) => void,
-  precision = 2
+  precision = 4,
 ) {
   // 状态变量
   let current = initialMin;
@@ -156,7 +156,7 @@ export function _Animate_NumericTransition(
   targetValue: number,
   stepCount: number,
   callback: (currentValue: number) => void,
-  precision: number = 4
+  precision: number = 4,
 ): void {
   if (stepCount <= 0) return console.error("动画步数 必须为正数");
 
@@ -190,7 +190,6 @@ export function _Animate_NumericTransition(
   // 启动动画
   animate();
 }
-
 
 /**
  * 三次贝塞尔缓动（与 CSS `cubic-bezier(x1, y1, x2, y2)` 语义一致）

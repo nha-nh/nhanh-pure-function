@@ -17,14 +17,14 @@ export default class Point extends Overlay<PointStyleType, [number, number]> {
     super(option);
 
     this.addEventListener("hover", this.defaultHover);
-    this.addEventListener("dragg", this.defaultDragg);
+    this.addEventListener("drag", this.defaultDrag);
   }
 
   protected updateValueScope() {
     this.initValueScope();
   }
 
-  defaultDragg: EventHandler<"dragg"> = (event, mouseEvent) => {
+  defaultDrag: EventHandler<"drag"> = (event, mouseEvent) => {
     const { offsetX, offsetY } = event.data;
     const { x, y } = this.calculateOffset(offsetX, offsetY);
 
