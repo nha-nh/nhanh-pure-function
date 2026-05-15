@@ -241,3 +241,25 @@ export function _Math_GetBezierCurveNodes(
   }
   return layer[0];
 }
+
+/**
+ * 根据宽高比与参数 progress，计算椭圆上的点（中心在原点）。
+ * @param aspectRatio 宽高比（width / height），即 X 半轴与 Y 半轴之比
+ * @param progress 曲线参数，通常取 [0, 1]，表示沿椭圆一周的位置
+ * @param normalizeToUnitSquare 为 true 时将坐标归一化到 [0,1]×[0,1]（外接矩形内）
+ * @returns 椭圆上的点 [x, y]
+ */
+export function _Math_GetEllipsePoints(
+  aspectRatio: number,
+  progress: number,
+  normalizeToUnitSquare?: boolean,
+): [number, number] {
+  const ratio = Math.abs(aspectRatio) || 1;
+  const angle = progress * Math.PI * 2;
+
+  const x = ratio * Math.cos(angle);
+  const y = Math.sin(angle);
+
+  if (normalizeToUnitSquare) return [(x + ratio) / (2 * ratio), (y + 1) / 2];
+  return [x, y];
+}

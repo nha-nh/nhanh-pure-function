@@ -895,3 +895,164 @@ export class _Utility_ColorConverter {
     return `hsva(${Math.round(h)}, ${Math.round(s)}%, ${Math.round(v)}%, ${finalAlpha})`;
   }
 }
+
+/** 历史快照记录。 */
+export interface _Utility_CursorHistoryRecord<T> {
+  /** 快照值。 */
+  readonly value: T;
+  /** 写入时的时间戳（`Date.now()`）。 */
+  readonly time: number;
+}
+
+/** `_Utility_CursorHistory` 的构造参数。 */
+export interface _Utility_CursorHistoryConfig<T> {
+  /** 可选的初始值。 */
+  value?: T;
+  /** 存储上限（默认 `50`）。`0` 或负数表示无限制。 */
+  maxSize?: number;
+  /** 游标变动 / 写入新值 / 清空时的回调。 */
+  onChange?: (
+    current: _Utility_CursorHistoryRecord<T> | undefined,
+    all: _Utility_CursorHistoryRecord<T>[],
+  ) => void;
+}
+
+/**
+ * 带游标的值序列：写入会丢弃当前位置之后的「前进」分支（与撤销/重做栈语义一致），
+ * 可通过 `prev` / `next` 在快照间移动。
+ *
+ * @typeParam T - 快照值的类型。
+ */
+export class _Utility_CursorHistory<T> {
+  private records: _Utility_CursorHistoryRecord<T>[] = [];
+  private _index = 0;
+  private _maxSize = 0;
+
+  /** 存储上限；`0` 表示无限制。超出时自动淘汰最早的记录。 */
+  get maxSize() {
+    return this._maxSize;
+  }
+  set maxSize(value: number) {
+    const v = value > 0 ? Math.floor(value) : 0;
+    if (this._maxSize === v) return;
+    this._maxSize = v;
+    this.trimOverflow();
+  }
+
+  /**
+   * 统一的游标更新入口：钳位、触发回调。
+   * 所有索引变动都经此处，保证 `onChange` 只在这里调用。
+   */
+  private get index() {
+    return this._index;
+  }
+  private set index(value: number) {
+    this._index = Math.max(0, Math.min(value, this.records.length - 1));
+    this.onChange?.(this.records[this._index], this.records);
+  }
+
+  /** 游标变动 / 写入新值 / 清空时的回调。 */
+  onChange?: _Utility_CursorHistoryConfig<T>["onChange"];
+
+  constructor(config: _Utility_CursorHistoryConfig<T> = {}) {
+    const { maxSize = 50, onChange, value } = config;
+    this.maxSize = maxSize;
+    if (onChange) this.onChange = onChange;
+    if (value !== undefined) this.value = value;
+  }
+
+  /** 当前游标处的值；序列为空时为 `undefined`。 */
+  get value(): T | undefined {
+    return this.records[this.index]?.value;
+  }
+
+  /**
+   * 在当前游标之后追加新值（深拷贝），并丢弃原「重做」分支。
+   * 若超出 `maxSize`，自动丢弃最早的记录。
+   */
+  set value(value: T) {
+    this.records.splice(this.index + 1);
+    this.records.push({ value: _Utility_Clone(value), time: Date.now() });
+    this.trimOverflow();
+    this.index = this.records.length - 1;
+  }
+
+  /** 已保存的快照个数。 */
+  get length(): number {
+    return this.records.length;
+  }
+
+  /** 当前游标下标（`0` ～ `length - 1`）。序列为空时为 `0`。 */
+  get position(): number {
+    return this.index;
+  }
+
+  /** 序列是否为空。 */
+  get isEmpty(): boolean {
+    return this.records.length === 0;
+  }
+
+  /** 是否可以后退（`prev`）。 */
+  get canPrev(): boolean {
+    return this.index > 0;
+  }
+
+  /** 是否可以前进（`next`）。 */
+  get canNext(): boolean {
+    return this.index < this.records.length - 1;
+  }
+
+  /** 游标后退一步；已在起点则返回 `false`。 */
+  prev(): boolean {
+    if (!this.canPrev) return false;
+    this.index--;
+    return true;
+  }
+
+  /** 游标前进一步；已在末尾则返回 `false`。 */
+  next(): boolean {
+    if (!this.canNext) return false;
+    this.index++;
+    return true;
+  }
+
+  /** 跳到指定下标；越界则返回 `false`。 */
+  jump(index: number): boolean {
+    if (index < 0 || index >= this.records.length) return false;
+    this.index = index;
+    return true;
+  }
+
+  /** 跳到第一项。 */
+  first(): boolean {
+    if (this.isEmpty) return false;
+    this.index = 0;
+    return true;
+  }
+
+  /** 跳到最后一项。 */
+  last(): boolean {
+    if (this.isEmpty) return false;
+    this.index = this.records.length - 1;
+    return true;
+  }
+
+  /** 返回当前序列的浅拷贝（便于调试或序列化）。 */
+  snapshot(): readonly _Utility_CursorHistoryRecord<T>[] {
+    return this.records.slice();
+  }
+
+  /** 清空所有记录并重置游标。 */
+  clear(): void {
+    this.records = [];
+    this.index = 0;
+  }
+
+  /** 若超出 `maxSize`，丢弃最早的记录并同步调整游标（绕过 setter 避免重复触发）。 */
+  private trimOverflow(): void {
+    if (this._maxSize <= 0 || this.records.length <= this._maxSize) return;
+    const excess = this.records.length - this._maxSize;
+    this.records.splice(0, excess);
+    this._index = Math.max(0, this._index - excess);
+  }
+}
