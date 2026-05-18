@@ -593,7 +593,7 @@ export function _Utility_Sleep(ms: number) {
       // 将dummy的值转换为字符串并试图修改URL的hash值，以防止被优化
       const str = dummy.toString().substring(0, 8);
       history.replaceState(null, "", `#${str}`);
-    } catch { }
+    } catch {}
   }
 
   // 返回实际暂停的时间
@@ -605,7 +605,7 @@ export function _Utility_Sleep(ms: number) {
  * 支持输入：hex/rgb/hsl/hsv，统一解析后输出指定格式。
  */
 export class _Utility_ColorConverter {
-  private constructor() { }
+  private constructor() {}
 
   private static readonly DEFAULT_ALPHA = 1;
 
@@ -635,7 +635,7 @@ export class _Utility_ColorConverter {
     else if (h < 180) [r1, g1, b1] = [0, c, x];
     else if (h < 240) [r1, g1, b1] = [0, x, c];
     else if (h < 300) [r1, g1, b1] = [x, 0, c];
-    else[r1, g1, b1] = [c, 0, x];
+    else [r1, g1, b1] = [c, 0, x];
 
     return {
       r: (r1 + m) * 255,
@@ -896,7 +896,6 @@ export class _Utility_ColorConverter {
   }
 }
 
-
 interface _Utility_UndoRedoConfig<T> {
   /** 存储上限；`0` 或负数表示无限制。超出时自动淘汰最早的记录。默认为 50 */
   maxSize?: number;
@@ -914,10 +913,7 @@ interface _Utility_UndoRedoRecord<T> {
 }
 
 /** 订阅者回调函数类型 */
-type _Utility_UndoRedoListener<T> = (
-  current: Readonly<T> | undefined,
-  record: Readonly<_Utility_UndoRedoRecord<T>> | undefined
-) => void;
+type _Utility_UndoRedoListener<T> = (current: Readonly<T> | undefined) => void;
 
 /**
  * 通用历史记录状态机
@@ -1077,7 +1073,7 @@ export class _Utility_UndoRedoHistory<T> {
   subscribe(listener: _Utility_UndoRedoListener<T>): () => void {
     this.listeners.add(listener);
     // 订阅时立即同步激活一次当前状态
-    listener(this.current, this.stack[this._index]);
+    listener(this.current);
 
     return () => {
       this.listeners.delete(listener);
@@ -1104,7 +1100,7 @@ export class _Utility_UndoRedoHistory<T> {
     const currentRecord = this.stack[this._index];
     const currentState = currentRecord?.state;
     for (const listener of this.listeners) {
-      listener(currentState, currentRecord);
+      listener(currentState);
     }
   }
 }
