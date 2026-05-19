@@ -116,15 +116,7 @@ export class _Tip {
     error: undefined,
   };
 
-  /**
-   * 构造函数
-   * @throws 如果尝试实例化该类，则抛出错误，因为应该使用静态方法
-   */
-  constructor() {
-    if (new.target === _Tip) {
-      throw new Error("请直接使用静态方法，而不是实例化此类");
-    }
-  }
+  private constructor() {}
 
   static register(type: TipType, handler: TipHandler) {
     if (typeof handler !== "function")

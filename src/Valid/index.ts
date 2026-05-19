@@ -10,7 +10,7 @@ import { DataType, Point } from "./type";
  */
 export function _Valid_IsNumberArray(
   arr: unknown,
-  minLength: number = 2
+  minLength: number = 2,
 ): boolean {
   const isArr = Array.isArray(arr) && arr.length >= minLength;
 
@@ -32,7 +32,7 @@ export function _Valid_IsNumberArray(
 export function _Valid_Is2DNumberArray(
   arr: unknown,
   minLength: number = 1,
-  innerMinLength: number = 2
+  innerMinLength: number = 2,
 ) {
   const isArr = Array.isArray(arr) && arr.length >= minLength;
   if (isArr) {
@@ -53,7 +53,7 @@ export function _Valid_Is2DNumberArray(
 export function _Valid_IsInMargin(
   value: number,
   target: number,
-  errorMargin: number
+  errorMargin: number,
 ): boolean {
   return Math.abs(value - target) <= errorMargin;
 }
@@ -66,7 +66,7 @@ export function _Valid_IsInMargin(
  */
 export function _Valid_IsPointInPolygon(
   point: Point,
-  polygon: Point[]
+  polygon: Point[],
 ): boolean {
   let isInside = false;
 
@@ -100,7 +100,7 @@ export function _Valid_DoesInfiniteLineIntersectRectangle(
   rectCorner1: [number, number],
   rectCorner2: [number, number],
   linePointA: [number, number],
-  linePointB: [number, number]
+  linePointB: [number, number],
 ): boolean {
   // 计算矩形边界范围
   const rectMinX = Math.min(rectCorner1[0], rectCorner2[0]);
@@ -274,14 +274,10 @@ export class _Valid_FileTypeChecker {
   // 缓存文件扩展名的条目，以提高性能
   private static cachedEntries = Object.entries(FILE_EXTENSIONS) as [
     FileType,
-    string[]
+    string[],
   ][];
 
-  constructor() {
-    if (new.target === _Valid_FileTypeChecker) {
-      throw new Error("请直接使用静态方法，而不是实例化此类");
-    }
-  }
+  private constructor() {}
 
   /**
    * 检查给定URL的文件类型
