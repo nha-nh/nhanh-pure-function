@@ -79,9 +79,20 @@ interface ShortcutBinding extends ShortcutOptions {
 }
 
 /**
- * 在 `window` 上监听键盘与鼠标事件，按配置触发快捷键回调。
+ * 全局快捷键管理器
+ *
+ * ⚠️ **注意**：本组件会在全局 `window` 上绑定多个事件监听器。
+ * 为了防止内存泄漏及非预期的快捷键触发，**在组件卸载或页面关闭时，必须显式调用 `.destroy()` 方法**。
+ *
+ * @example
+ * const manager = new _Utility_ShortcutManager();
+ * // 离开页面时
+ * manager.destroy();
  */
 export class _Utility_ShortcutManager {
+  // 静态计数器：记录当前活跃的实例数量
+  private static activeInstances = 0;
+
   /** 最近一次 `mousedown` 的目标，供 `scopeType: "click"` 使用 */
   private lastClickDom?: HTMLElement;
   /** 最近一次 `mouseover` 的目标，供 `scopeType: "hover"` 使用 */
@@ -97,6 +108,16 @@ export class _Utility_ShortcutManager {
 
   constructor(debug?: boolean) {
     this.debug = !!debug;
+
+    // 提醒策略 A：当发现存在多个未销毁的实例时，发出警告
+    _Utility_ShortcutManager.activeInstances++;
+    if (_Utility_ShortcutManager.activeInstances > 1) {
+      console.warn(
+        `[_Utility_ShortcutManager] 检测到当前页面存在 ${_Utility_ShortcutManager.activeInstances} 个活跃实例。` +
+          `请确保不再使用的实例已显式调用 \`destroy()\` 以释放全局 window 监听器，避免内存泄漏。`,
+      );
+    }
+
     window.addEventListener("mouseover", this.handleMouseOver);
     window.addEventListener("mousedown", this.handleMouseDown);
     window.addEventListener("keydown", this.handleKeyDown);
@@ -134,7 +155,11 @@ export class _Utility_ShortcutManager {
     this.bindings.delete(key);
   }
 
-  /** 移除所有监听、清空状态，实例不可再使用 */
+  /**
+   * 彻底销毁当前实例，清空所有快捷键绑定，并移除全局 window 事件监听器。
+   *
+   * ⚠️ **调用时机**：在单页应用（如 Vue/React 组件卸载）或不需要快捷键时**务必调用**。
+   */
   destroy() {
     this.bindings.forEach((b) => b.timerId && window.clearTimeout(b.timerId));
     this.bindings.clear();
@@ -147,6 +172,11 @@ export class _Utility_ShortcutManager {
     window.removeEventListener("keydown", this.handleKeyDown);
     window.removeEventListener("keyup", this.handleKeyUp);
     window.removeEventListener("blur", this.clearKeys);
+
+    _Utility_ShortcutManager.activeInstances = Math.max(
+      0,
+      _Utility_ShortcutManager.activeInstances - 1,
+    );
   }
 
   private handleMouseOver = (event: MouseEvent) => {
