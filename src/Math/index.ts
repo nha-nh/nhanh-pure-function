@@ -214,22 +214,30 @@ export const _Math_Degree = new Proxy(Math, {
 });
 
 /**
- * 根据控制点与参数 t，用 De Casteljau 计算 Bézier 曲线上的点。
+ * 根据控制点与参数 t，用 De Casteljau 计算 Bézier 曲线上的点和方向弧度。
+ *
+ * 【为什么可以这样获取方向】
+ * 根据 De Casteljau 算法的特性，当循环降维到倒数第二层（只剩最后 2 个点）时，
+ * 这两点连线的方向 [p1 - p0] 刚好就是曲线在该点处的切线向量。
+ * 此时使用 Math.atan2 即可直接换算出切线方向的弧度，无需单独执行求导公式。
+ *
  * @param nodes 控制点
  * @param progress 曲线参数，通常取 [0, 1]
- * @returns 曲线上的点
+ * @returns 曲线上的点和方向 [x, y, 弧度值]
  */
 export function _Math_GetBezierCurveNodes(
   nodes: [number, number][],
   progress: number,
-): [number, number] {
+): [number, number, number] {
   const n = nodes.length;
-  if (n === 0) return [0, 0];
-  if (n === 1) return [nodes[0][0], nodes[0][1]];
+  if (n === 0) return [0, 0, 0];
+  if (n === 1) return [nodes[0][0], nodes[0][1], 0];
 
   const t = progress;
   let layer: [number, number][] = nodes.map((p) => [p[0], p[1]]);
-  while (layer.length > 1) {
+
+  // 变更终止条件：循环到只剩下最后两个点时停止
+  while (layer.length > 2) {
     const next: [number, number][] = [];
     for (let i = 0; i < layer.length - 1; i++) {
       next.push([
@@ -239,7 +247,21 @@ export function _Math_GetBezierCurveNodes(
     }
     layer = next;
   }
-  return layer[0];
+
+  // 此时 layer 包含且仅包含最后两个控制点 p0 和 p1
+  const p0 = layer[0];
+  const p1 = layer[1];
+
+  // 1. 计算最终的曲线点位置
+  const x = (1 - t) * p0[0] + t * p1[0];
+  const y = (1 - t) * p0[1] + t * p1[1];
+
+  // 2. 计算切线向量并转换为弧度（范围 -PI 到 PI）
+  const dirX = p1[0] - p0[0];
+  const dirY = p1[1] - p0[1];
+  const angle = Math.atan2(dirY, dirX);
+
+  return [x, y, angle];
 }
 
 /**

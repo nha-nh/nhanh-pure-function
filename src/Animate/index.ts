@@ -26,7 +26,7 @@ export function _Animate_Schedule(
  * @param initialMin - 振荡器初始最小值
  * @param initialMax - 振荡器初始最大值
  * @param initialSteps - 从最小值到最大值所需的动画步数
- * @param callback - 每帧更新时的回调函数，接收当前振荡值
+ * @param callback - 每帧回调 `(value, direction)`：`value` 为经 `precision` 处理后的当前值；`direction` 为本帧步进方向（`1` 朝向 `max`，`-1` 朝向 `min`），触边翻转后传入
  * @param precision - 数值精度（保留小数位数，默认4位）
  * @returns 振荡器控制对象，包含播放/暂停/参数更新等方法
  */
@@ -34,7 +34,7 @@ export function _Animate_CreateOscillator(
   initialMin: number,
   initialMax: number,
   initialSteps: number,
-  callback: (value: number) => void,
+  callback: (value: number, direction: 1 | -1) => void,
   precision = 4,
 ) {
   // 状态变量
@@ -104,7 +104,7 @@ export function _Animate_CreateOscillator(
     direction = current >= max ? -1 : current <= min ? 1 : direction;
     current = clamp(current + stepSize * direction);
 
-    callback(toPrecision(current));
+    callback(toPrecision(current), direction);
     requestAnimationFrame(animate);
   };
 
