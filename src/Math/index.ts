@@ -223,7 +223,7 @@ export const _Math_Degree = new Proxy(Math, {
  *
  * @param nodes 控制点
  * @param progress 曲线参数，通常取 [0, 1]
- * @returns 曲线上的点和方向 [x, y, 弧度值]
+ * @returns 曲线上的点和方向 [x, y, radian]
  */
 export function _Math_GetBezierCurveNodes(
   nodes: [number, number][],
@@ -259,9 +259,9 @@ export function _Math_GetBezierCurveNodes(
   // 2. 计算切线向量并转换为弧度（范围 -PI 到 PI）
   const dirX = p1[0] - p0[0];
   const dirY = p1[1] - p0[1];
-  const angle = Math.atan2(dirY, dirX);
+  const radian = Math.atan2(dirY, dirX);
 
-  return [x, y, angle];
+  return [x, y, radian];
 }
 
 /**
