@@ -1,17 +1,3 @@
-/**
- * 全局快捷键管理：支持组合键、多步序列、作用域与输入框上下文过滤。
- *
- * @example
- * ```ts
- * const shortcuts = new _Utility_ShortcutManager();
- * shortcuts.bind("control+s,control+shift+s", {
- *   callback: (e) => { e.preventDefault(); save(); },
- *   sequenceDelimiter: ",",
- *   chordDelimiter: "+",
- * });
- * ```
- */
-
 /** `bind` 时传入的配置项 */
 interface ShortcutOptions {
   /** 匹配成功后的回调 */
@@ -28,6 +14,16 @@ interface ShortcutOptions {
   timeout?: number;
   /** 为 `true` 时，在 input / textarea / contentEditable 内也响应快捷键 */
   enableInInput?: boolean;
+  /**
+   * 是否允许长按按键时重复触发回调，默认 `false`。
+   * 适用于如 `+`、`-`、方向键等需要连续操作的场景。
+   */
+  allowRepeat?: boolean;
+  /**
+   * 允许重复触发时的最小时间间隔（毫秒）。
+   * 由于操作系统的原生长按触发频率不可控且通常极高，利用该属性对重复事件进行节流。
+   */
+  repeatInterval?: number;
 }
 
 /**
@@ -76,6 +72,8 @@ interface ShortcutBinding extends ShortcutOptions {
   currentIndex: number;
   /** 多步序列超时定时器 ID */
   timerId?: number;
+  /** 上次成功触发回调的时间戳。用于长按重复触发时的节流控制 */
+  lastFiredAt?: number;
 }
 
 /**
@@ -194,21 +192,29 @@ export class _Utility_ShortcutManager {
 
   private handleKeyDown = (event: KeyboardEvent) => {
     const key = this.normalizeKey(event.key);
-    if (this.downKeys.includes(key)) return;
+    const isKeyRepeat = event.repeat;
+
+    if (this.downKeys.includes(key)) {
+      // 为什么拦截：系统在长按时会不断派发重复的 keydown，此时该键已在追踪序列内。
+      // 如果这不是系统的原生重发（极为罕见的异常），则丢弃。
+      if (!isKeyRepeat) return;
+    } else {
+      this.downKeys.push(key);
+    }
 
     if (this.debug) {
       console.log(
-        `[Shortcut Debug] 📥 keydown -> "${key}" | 当前按压序列: [${[...this.downKeys, key].join(", ")}]`,
+        `[Shortcut Debug] 📥 keydown -> "${key}" ${isKeyRepeat ? "(repeat)" : ""} | 当前按压序列: [${this.downKeys.join(", ")}]`,
       );
     }
 
-    this.downKeys.push(key);
-    this.checkBindings(event);
+    this.checkBindings(event, isKeyRepeat);
   };
 
   private handleKeyUp = (event: KeyboardEvent) => {
     const key = this.normalizeKey(event.key);
     const index = this.downKeys.indexOf(key);
+
     if (index !== -1) {
       this.downKeys.splice(index, 1);
 
@@ -218,15 +224,31 @@ export class _Utility_ShortcutManager {
         );
       }
     }
+
+    // 为什么在这里重置：
+    // 对于允许连续触发的配置（allowRepeat = true），其触发后状态会保留以匹配后续的 repeat 事件。
+    // 当该组合键中的任意按键被物理松开时，说明长按操作已结束，必须显式重置以迎接下次全新操作。
+    this.bindings.forEach((binding) => {
+      if (
+        binding.allowRepeat &&
+        binding.currentIndex === binding.sequence.length - 1
+      ) {
+        const lastExpectedChord = binding.sequence[binding.currentIndex];
+        if (lastExpectedChord.includes(key)) {
+          this.resetBinding(binding);
+        }
+      }
+    });
   };
 
   /**
    * 遍历所有绑定：校验作用域与输入上下文后，用数组匹配当前步骤；
    * 完全匹配则推进序列或触发回调，前缀匹配则等待，否则重置。
    */
-  private checkBindings(event: KeyboardEvent) {
-    let preventDefaultFlag = false;
+  private checkBindings(event: KeyboardEvent, isKeyRepeat: boolean) {
+    let shouldPreventDefault = false;
     const activeElement = document.activeElement as HTMLElement;
+    const now = Date.now();
 
     this.bindings.forEach((binding, shortcutText) => {
       const currentExpectedChord = binding.sequence[binding.currentIndex];
@@ -243,37 +265,57 @@ export class _Utility_ShortcutManager {
         return;
       }
 
-      if (
-        !this.isValidScope(binding) ||
-        !this.isValidContext(binding, activeElement)
-      ) {
+      if (!this.isValidContext(binding, activeElement)) {
         return;
       }
 
       if (this.isExactMatch(this.downKeys, currentExpectedChord)) {
-        preventDefaultFlag = true;
+        shouldPreventDefault = true;
 
         if (binding.currentIndex === binding.sequence.length - 1) {
+          // 当前为序列最后一步。如果是由长按产生的事件，则校验重发限制
+          if (isKeyRepeat) {
+            if (!binding.allowRepeat) return;
+
+            if (binding.repeatInterval && binding.lastFiredAt) {
+              if (now - binding.lastFiredAt < binding.repeatInterval) {
+                return; // 节流控制：未达冷却时间，阻断本次触发
+              }
+            }
+          }
+
           if (this.debug) {
             console.log(
               `[Shortcut Debug] 🎉 成功触发快捷键: "${shortcutText}"`,
             );
           }
+
           binding.callback(event);
-          this.resetBinding(binding);
-        } else {
-          if (this.debug) {
-            console.log(
-              `[Shortcut Debug] ⏳ 序列匹配中进度: (${binding.currentIndex}/${binding.sequence.length})，等待下一步...`,
-            );
+          binding.lastFiredAt = now;
+
+          // 为什么在此分叉：
+          // 如果允许重复触发，则保持当前 currentIndex 进度，以便下一个 native repeat 能继续匹配本步骤。
+          // 否则，视为单次触发结束，立即清零。
+          if (!binding.allowRepeat) {
+            this.resetBinding(binding);
           }
-          binding.currentIndex++;
-          this.startSequenceTimer(binding);
+        } else {
+          // 当前为多步序列的中间阶段。
+          // 为什么做此限制：长按产生的重复事件不应推进序列进度（如 "g, i" 序列长按 'g' 是无意义的）。
+          if (!isKeyRepeat) {
+            if (this.debug) {
+              console.log(
+                `[Shortcut Debug] ⏳ 序列匹配中进度: (${binding.currentIndex + 1}/${binding.sequence.length})，等待下一步...`,
+              );
+            }
+            binding.currentIndex++;
+            this.startSequenceTimer(binding);
+          }
         }
       } else if (this.isPrefixMatch(this.downKeys, currentExpectedChord)) {
-        // 符合前缀，不做重置
+        // 符合前缀，不做重置，等待完整键入
       } else {
-        // 如果当前绑定有进度，但是按错了，通知重置
+        // 为什么在此重置：按键存在冲突（错误组合或序列断链），立刻放弃现有累计匹配进度。
         if (binding.currentIndex > 0) {
           if (this.debug) {
             console.log(
@@ -285,7 +327,7 @@ export class _Utility_ShortcutManager {
       }
     });
 
-    if (preventDefaultFlag) {
+    if (shouldPreventDefault) {
       event.preventDefault();
     }
   }
@@ -300,6 +342,7 @@ export class _Utility_ShortcutManager {
 
   private resetBinding(binding: ShortcutBinding) {
     binding.currentIndex = 0;
+    binding.lastFiredAt = undefined;
     if (binding.timerId) {
       window.clearTimeout(binding.timerId);
       binding.timerId = undefined;
