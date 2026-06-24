@@ -1,3 +1,4 @@
+import { _Type_DeepWritable } from "../Types";
 import { _Valid_DataType } from "../Valid";
 import {
   _parsePathSegments,
@@ -6,7 +7,7 @@ import {
   INDEX_EXTRACT_REGEX,
 } from "./type";
 
-export * from "./Runtime";
+export * from "./modules";
 
 /**
  * 寻找空闲时机执行传入方法
@@ -15,7 +16,7 @@ export * from "./Runtime";
  */
 export function _Utility_ExecuteWhenIdle(
   callback: (deadline?: IdleDeadline) => void,
-  timeout = 3000,
+  timeout = 3000
 ) {
   if (typeof callback !== "function")
     return console.error("非函数：", callback);
@@ -39,7 +40,7 @@ export function _Utility_ExecuteWhenIdle(
  */
 export function _Utility_WaitForCondition(
   conditionChecker: () => boolean,
-  timeoutMillis: number,
+  timeoutMillis: number
 ): Promise<number> {
   const startTime = Date.now();
   return new Promise((resolve, reject) => {
@@ -64,7 +65,7 @@ export function _Utility_MergeObjects<T, T1>(
   A: T,
   B: T1,
   visitedObjects: [any, any][] = [],
-  outTime = Date.now(),
+  outTime = Date.now()
 ): (T & T1) | T | T1 | undefined {
   /** 疑似死循环 */
   if (outTime < Date.now() - 50) {
@@ -91,7 +92,7 @@ export function _Utility_MergeObjects<T, T1>(
             AC,
             BC,
             visitedObjects,
-            outTime,
+            outTime
           );
           /** @ts-ignore */
           A[key] = fianlValue;
@@ -108,7 +109,7 @@ export function _Utility_MergeObjects<T, T1>(
           AC,
           BC,
           visitedObjects,
-          outTime,
+          outTime
         );
         /** @ts-ignore */
         A[index] = fianlValue;
@@ -144,7 +145,7 @@ export function _Utility_GenerateUUID(prefix = "") {
  */
 export function _Utility_Debounce<T extends (...args: any[]) => void>(
   fn: T,
-  delay: number,
+  delay: number
 ): (...args: Parameters<T>) => void {
   let timeoutId: NodeJS.Timeout | undefined;
   return function (...args) {
@@ -164,7 +165,7 @@ export function _Utility_Debounce<T extends (...args: any[]) => void>(
  */
 export function _Utility_Throttle<T extends (...args: any[]) => void>(
   fn: T,
-  delay: number,
+  delay: number
 ): (...args: Parameters<T>) => void {
   let lastCallTime = -Infinity;
 
@@ -243,7 +244,7 @@ export function _Utility_SetTargetByPath(
   rootObject: any,
   path: string,
   value: any,
-  skipIfExists?: boolean,
+  skipIfExists?: boolean
 ): any {
   if (!rootObject || !path) return value;
 
@@ -326,7 +327,7 @@ export function _Utility_RotateList<T>(list: T[]) {
  * @param {any} val - 需要克隆的值
  * @returns {any} - 克隆后的值
  */
-export function _Utility_Clone<T>(val: T) {
+export function _Utility_Clone<T>(val: T): _Type_DeepWritable<T> {
   // 保存原始的structuredClone方法引用
   const oldClone = window.structuredClone;
 
@@ -389,7 +390,7 @@ export function _Utility_Clone<T>(val: T) {
         (value as Map<any, any>).forEach((val, key) => {
           newMap.set(
             deepClone(key, referenceMap),
-            deepClone(val, referenceMap),
+            deepClone(val, referenceMap)
           );
         });
         return newMap as T;
@@ -422,19 +423,19 @@ export function _Utility_Clone<T>(val: T) {
         const constructor = typedArray.constructor as new (
           buffer: ArrayBuffer,
           byteOffset?: number,
-          length?: number,
+          length?: number
         ) => typeof typedArray;
 
         // 克隆底层ArrayBuffer
         const buffer = typedArray.buffer.slice(
           typedArray.byteOffset,
-          typedArray.byteOffset + typedArray.byteLength,
+          typedArray.byteOffset + typedArray.byteLength
         );
 
         const cloned = new constructor(
           buffer as ArrayBuffer,
           typedArray.byteOffset,
-          typedArray.byteLength / (typedArray as any).BYTES_PER_ELEMENT,
+          typedArray.byteLength / (typedArray as any).BYTES_PER_ELEMENT
         );
 
         referenceMap.set(value, cloned);
@@ -493,7 +494,7 @@ export function _Utility_TimeConsumption<T extends Function>(
     level?: [number, string][];
     maxHistory?: number;
     prefix?: string;
-  },
+  }
 ): T | void {
   const defaultLevel: [number, string][] = [
     [11, "#d03050"],
@@ -559,10 +560,10 @@ export function _Utility_TimeConsumption<T extends Function>(
     // 输出带样式的日志，包含单次耗时和平均耗时
     console.log(
       `%c${prefix ? prefix + " - " : ""}单次耗时：${elapsedTime.toFixed(
-        2,
+        2
       )}ms\n%c平均耗时（${drawTimes.length}次）：${avgTime.toFixed(2)}ms`,
       `color: ${singleColor}; padding: 2px 0;`,
-      `color: ${avgColor}; padding: 2px 0;`,
+      `color: ${avgColor}; padding: 2px 0;`
     );
 
     return result;
@@ -600,300 +601,4 @@ export function _Utility_Sleep(ms: number) {
 
   // 返回实际暂停的时间
   return Date.now() - start;
-}
-
-/**
- * 颜色转换工具。
- * 支持输入：hex/rgb/hsl/hsv，统一解析后输出指定格式。
- */
-export class _Utility_ColorConverter {
-  private constructor() {}
-
-  private static readonly DEFAULT_ALPHA = 1;
-
-  /**
-   * 数值钳制，确保在合法区间内。
-   */
-  private static clamp(value: number, min: number, max: number) {
-    return Math.min(Math.max(value, min), max);
-  }
-
-  private static normalizeHue(hue: number) {
-    return ((hue % 360) + 360) % 360;
-  }
-
-  /**
-   * 根据色相分段与色度参数生成 RGB（0-255）。
-   */
-  private static chromaToRgb(h: number, c: number, m: number) {
-    const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
-
-    let r1 = 0;
-    let g1 = 0;
-    let b1 = 0;
-
-    if (h < 60) [r1, g1, b1] = [c, x, 0];
-    else if (h < 120) [r1, g1, b1] = [x, c, 0];
-    else if (h < 180) [r1, g1, b1] = [0, c, x];
-    else if (h < 240) [r1, g1, b1] = [0, x, c];
-    else if (h < 300) [r1, g1, b1] = [x, 0, c];
-    else [r1, g1, b1] = [c, 0, x];
-
-    return {
-      r: (r1 + m) * 255,
-      g: (g1 + m) * 255,
-      b: (b1 + m) * 255,
-    };
-  }
-
-  private static resolveAlpha(alpha: number | undefined, fallback: number) {
-    return Number.isFinite(alpha) ? this.clamp(alpha!, 0, 1) : fallback;
-  }
-
-  private static toRoundedRgbString(r: number, g: number, b: number) {
-    return `rgb(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)})`;
-  }
-
-  /**
-   * HSL 转 RGB。
-   * h: 0-360, s/l: 0-100
-   */
-  private static hslToRgb(h: number, s: number, l: number) {
-    const hh = this.normalizeHue(h);
-    const ss = this.clamp(s, 0, 100) / 100;
-    const ll = this.clamp(l, 0, 100) / 100;
-
-    const c = (1 - Math.abs(2 * ll - 1)) * ss;
-    const m = ll - c / 2;
-    return this.chromaToRgb(hh, c, m);
-  }
-
-  /**
-   * HSV 转 RGB。
-   * h: 0-360, s/v: 0-100
-   */
-  private static hsvToRgb(h: number, s: number, v: number) {
-    const hh = this.normalizeHue(h);
-    const ss = this.clamp(s, 0, 100) / 100;
-    const vv = this.clamp(v, 0, 100) / 100;
-
-    const c = vv * ss;
-    const m = vv - c;
-    return this.chromaToRgb(hh, c, m);
-  }
-
-  /**
-   * 解析任意受支持的颜色格式并标准化为 RGBA。
-   */
-  private static parseColor(color: string) {
-    const normalized = color.trim().toLowerCase();
-
-    if (normalized.startsWith("#")) {
-      const hex = normalized.slice(1);
-
-      if (hex.length === 3 || hex.length === 4) {
-        const [r, g, b, a = "f"] = hex.split("");
-        return {
-          r: parseInt(`${r}${r}`, 16),
-          g: parseInt(`${g}${g}`, 16),
-          b: parseInt(`${b}${b}`, 16),
-          a: parseInt(`${a}${a}`, 16) / 255,
-        };
-      }
-
-      if (hex.length === 6 || hex.length === 8) {
-        const r = parseInt(hex.slice(0, 2), 16);
-        const g = parseInt(hex.slice(2, 4), 16);
-        const b = parseInt(hex.slice(4, 6), 16);
-        const a =
-          hex.length === 8
-            ? parseInt(hex.slice(6, 8), 16) / 255
-            : this.DEFAULT_ALPHA;
-        return { r, g, b, a };
-      }
-    }
-
-    const matched = normalized.match(/^rgba?\(([^)]+)\)$/);
-    if (matched) {
-      const parts = matched[1].split(",").map((part) => part.trim());
-      if (parts.length >= 3) {
-        const r = this.clamp(Number(parts[0]), 0, 255);
-        const g = this.clamp(Number(parts[1]), 0, 255);
-        const b = this.clamp(Number(parts[2]), 0, 255);
-        const a =
-          parts.length >= 4
-            ? this.clamp(Number(parts[3]), 0, 1)
-            : this.DEFAULT_ALPHA;
-        return { r, g, b, a };
-      }
-    }
-
-    const hslMatched = normalized.match(/^hsl\(([^)]+)\)$/);
-    if (hslMatched) {
-      const parts = hslMatched[1]
-        .split(",")
-        .map((part) => part.trim().replace("%", ""));
-      if (parts.length >= 3) {
-        const h = Number(parts[0]);
-        const s = Number(parts[1]);
-        const l = Number(parts[2]);
-        const rgb = this.hslToRgb(h, s, l);
-        return { ...rgb, a: this.DEFAULT_ALPHA };
-      }
-    }
-
-    const hsvMatched = normalized.match(/^hsv\(([^)]+)\)$/);
-    if (hsvMatched) {
-      const parts = hsvMatched[1]
-        .split(",")
-        .map((part) => part.trim().replace("%", ""));
-      if (parts.length >= 3) {
-        const h = Number(parts[0]);
-        const s = Number(parts[1]);
-        const v = Number(parts[2]);
-        const rgb = this.hsvToRgb(h, s, v);
-        return { ...rgb, a: this.DEFAULT_ALPHA };
-      }
-    }
-
-    console.error("Invalid color format", color);
-    return { r: 0, g: 0, b: 0, a: this.DEFAULT_ALPHA };
-  }
-
-  /**
-   * 十进制颜色分量转两位十六进制字符串。
-   */
-  private static toHexPart(value: number) {
-    return Math.round(this.clamp(value, 0, 255))
-      .toString(16)
-      .padStart(2, "0");
-  }
-
-  /**
-   * RGB 转 HSL。
-   * 返回 h:0-360, s/l:0-100
-   */
-  private static rgbToHsl(r: number, g: number, b: number) {
-    const rr = this.clamp(r, 0, 255) / 255;
-    const gg = this.clamp(g, 0, 255) / 255;
-    const bb = this.clamp(b, 0, 255) / 255;
-    const max = Math.max(rr, gg, bb);
-    const min = Math.min(rr, gg, bb);
-    const delta = max - min;
-
-    let h = 0;
-    if (delta !== 0) {
-      if (max === rr) h = 60 * (((gg - bb) / delta) % 6);
-      else if (max === gg) h = 60 * ((bb - rr) / delta + 2);
-      else h = 60 * ((rr - gg) / delta + 4);
-    }
-    if (h < 0) h += 360;
-
-    const l = (max + min) / 2;
-    const s = delta === 0 ? 0 : delta / (1 - Math.abs(2 * l - 1));
-
-    return { h, s: s * 100, l: l * 100 };
-  }
-
-  /**
-   * RGB 转 HSV。
-   * 返回 h:0-360, s/v:0-100
-   */
-  private static rgbToHsv(r: number, g: number, b: number) {
-    const rr = this.clamp(r, 0, 255) / 255;
-    const gg = this.clamp(g, 0, 255) / 255;
-    const bb = this.clamp(b, 0, 255) / 255;
-    const max = Math.max(rr, gg, bb);
-    const min = Math.min(rr, gg, bb);
-    const delta = max - min;
-
-    let h = 0;
-    if (delta !== 0) {
-      if (max === rr) h = 60 * (((gg - bb) / delta) % 6);
-      else if (max === gg) h = 60 * ((bb - rr) / delta + 2);
-      else h = 60 * ((rr - gg) / delta + 4);
-    }
-    if (h < 0) h += 360;
-
-    const s = max === 0 ? 0 : delta / max;
-    const v = max;
-
-    return { h, s: s * 100, v: v * 100 };
-  }
-
-  /**
-   * 转换为 HEX（#RRGGBB）。
-   */
-  static toHex(color: string) {
-    const { r, g, b } = this.parseColor(color);
-    return `#${this.toHexPart(r)}${this.toHexPart(g)}${this.toHexPart(b)}`;
-  }
-
-  /**
-   * 转换为 HEXA（#RRGGBBAA）。
-   * alpha 不传时保留输入颜色中的透明度（默认 1）。
-   */
-  static toHexa(color: string, alpha?: number) {
-    const { r, g, b, a } = this.parseColor(color);
-    const finalAlpha = this.resolveAlpha(alpha, a);
-    return `#${this.toHexPart(r)}${this.toHexPart(g)}${this.toHexPart(b)}${this.toHexPart(finalAlpha * 255)}`;
-  }
-
-  /**
-   * 转换为 RGB（rgb(r, g, b)）。
-   */
-  static toRgb(color: string) {
-    const { r, g, b } = this.parseColor(color);
-    return this.toRoundedRgbString(r, g, b);
-  }
-
-  /**
-   * 转换为 RGBA（rgba(r, g, b, a)）。
-   * alpha 不传时保留输入颜色中的透明度（默认 1）。
-   */
-  static toRgba(color: string, alpha?: number) {
-    const parsed = this.parseColor(color);
-    const finalAlpha = this.resolveAlpha(alpha, parsed.a);
-    return `rgba(${Math.round(parsed.r)}, ${Math.round(parsed.g)}, ${Math.round(parsed.b)}, ${finalAlpha})`;
-  }
-
-  /**
-   * 转换为 HSL（hsl(h, s%, l%)）。
-   */
-  static toHsl(color: string) {
-    const { r, g, b } = this.parseColor(color);
-    const { h, s, l } = this.rgbToHsl(r, g, b);
-    return `hsl(${Math.round(h)}, ${Math.round(s)}%, ${Math.round(l)}%)`;
-  }
-
-  /**
-   * 转换为 HSLA（hsla(h, s%, l%, a)）。
-   * alpha 不传时保留输入颜色中的透明度（默认 1）。
-   */
-  static toHsla(color: string, alpha?: number) {
-    const parsed = this.parseColor(color);
-    const { h, s, l } = this.rgbToHsl(parsed.r, parsed.g, parsed.b);
-    const finalAlpha = this.resolveAlpha(alpha, parsed.a);
-    return `hsla(${Math.round(h)}, ${Math.round(s)}%, ${Math.round(l)}%, ${finalAlpha})`;
-  }
-
-  /**
-   * 转换为 HSV（hsv(h, s%, v%)）。
-   */
-  static toHsv(color: string) {
-    const { r, g, b } = this.parseColor(color);
-    const { h, s, v } = this.rgbToHsv(r, g, b);
-    return `hsv(${Math.round(h)}, ${Math.round(s)}%, ${Math.round(v)}%)`;
-  }
-
-  /**
-   * 转换为 HSVA（hsva(h, s%, v%, a)）。
-   * alpha 不传时保留输入颜色中的透明度（默认 1）。
-   */
-  static toHsva(color: string, alpha?: number) {
-    const parsed = this.parseColor(color);
-    const { h, s, v } = this.rgbToHsv(parsed.r, parsed.g, parsed.b);
-    const finalAlpha = this.resolveAlpha(alpha, parsed.a);
-    return `hsva(${Math.round(h)}, ${Math.round(s)}%, ${Math.round(v)}%, ${finalAlpha})`;
-  }
 }

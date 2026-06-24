@@ -6,7 +6,7 @@ import {
   UiLibrary,
 } from "./type";
 
-export * from "./Runtime";
+export * from "./modules";
 
 /**
  * 滚动结束监听器

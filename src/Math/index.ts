@@ -12,7 +12,7 @@ const MAX_LAT = 85.05112878;
  */
 export function _Math_LngLatToPlane(
   lng: number,
-  lat: number,
+  lat: number
 ): [number, number] {
   const clampedLng = Math.max(Math.min(lng, 180), -180);
   const clampedLat = Math.max(Math.min(lat, MAX_LAT), -MAX_LAT);
@@ -50,7 +50,7 @@ export function _Math_PlaneToLngLat(x: number, y: number): [number, number] {
 export function _Math_PointToLineDistance(
   point: [number, number],
   lineStart: [number, number],
-  lineEnd: [number, number],
+  lineEnd: [number, number]
 ): number {
   const [x0, y0] = point;
   const [x1, y1] = lineStart;
@@ -63,7 +63,7 @@ export function _Math_PointToLineDistance(
   t = Math.max(0, Math.min(1, t));
 
   return Math.sqrt(
-    (x0 - (x1 + t * (x2 - x1))) ** 2 + (y0 - (y1 + t * (y2 - y1))) ** 2,
+    (x0 - (x1 + t * (x2 - x1))) ** 2 + (y0 - (y1 + t * (y2 - y1))) ** 2
   );
 }
 
@@ -85,7 +85,7 @@ export function _Math_GetArcPoints(
   startAngle: number,
   endAngle: number,
   axisX: number = 1,
-  axisY: number = 1,
+  axisY: number = 1
 ): [[number, number], [number, number]] {
   // 计算起点坐标（考虑坐标轴方向）
   const startX = x + radius * Math.cos(startAngle) * axisX;
@@ -101,12 +101,35 @@ export function _Math_GetArcPoints(
   ];
 }
 
+/**
+ * 计算两个经纬度坐标之间的直线距离（单位：米）。
+ *
+ * 先将经纬度通过 Mercator 投影转换为平面坐标（米），
+ * 再计算二维平面欧几里得距离，适用于短距离近似计算。
+ *
+ * @param lng1 第一个点的经度（度），范围 [-180, 180]
+ * @param lat1 第一个点的纬度（度），范围 [-85.05, 85.05]
+ * @param lng2 第二个点的经度（度），范围 [-180, 180]
+ * @param lat2 第二个点的纬度（度），范围 [-85.05, 85.05]
+ * @returns 两点间的距离（米）
+ */
+export function _Math_CalculateDistanceLngLat(
+  lng1: number,
+  lat1: number,
+  lng2: number,
+  lat2: number
+) {
+  const [x1, y1] = _Math_LngLatToPlane(lng1, lat1);
+  const [x2, y2] = _Math_LngLatToPlane(lng2, lat2);
+  return _Math_CalculateDistance2D(x1, y1, x2, y2);
+}
+
 /** 计算平面直角坐标系中两点的距离 */
 export function _Math_CalculateDistance2D(
   x1: number,
   y1: number,
   x2: number,
-  y2: number,
+  y2: number
 ) {
   return Math.hypot(Math.abs(x2 - x1), Math.abs(y2 - y1));
 }
@@ -116,7 +139,7 @@ export function _Math_GetMidpoint(
   x1: number,
   y1: number,
   x2: number,
-  y2: number,
+  y2: number
 ) {
   const midX = (x1 + x2) / 2;
   const midY = (y1 + y2) / 2;
@@ -135,7 +158,7 @@ export function _Math_GetBoundaryIntersection(
   startPoint: [number, number],
   direction: [number, number],
   canvasWidth: number,
-  canvasHeight: number,
+  canvasHeight: number
 ): [number, number] {
   const [startX, startY] = startPoint;
   const [dirX, dirY] = direction;
@@ -227,7 +250,7 @@ export const _Math_Degree = new Proxy(Math, {
  */
 export function _Math_GetBezierCurveNodes(
   nodes: [number, number][],
-  progress: number,
+  progress: number
 ): [number, number, number] {
   const n = nodes.length;
   if (n === 0) return [0, 0, 0];
@@ -274,7 +297,7 @@ export function _Math_GetBezierCurveNodes(
 export function _Math_GetEllipsePoints(
   aspectRatio: number,
   progress: number,
-  normalizeToUnitSquare?: boolean,
+  normalizeToUnitSquare?: boolean
 ): [number, number] {
   const ratio = Math.abs(aspectRatio) || 1;
   const angle = progress * Math.PI * 2;
@@ -284,4 +307,133 @@ export function _Math_GetEllipsePoints(
 
   if (normalizeToUnitSquare) return [(x + ratio) / (2 * ratio), (y + 1) / 2];
   return [x, y];
+}
+
+/**
+ * 将数值钳制在指定区间内。
+ * @param value 输入值
+ * @param min 下限
+ * @param max 上限
+ * @returns 钳制后的值
+ */
+export function _Math_Clamp(value: number, min: number, max: number): number {
+  return Math.min(Math.max(value, min), max);
+}
+
+/**
+ * 线性插值。
+ * @param a 起始值
+ * @param b 结束值
+ * @param t 插值参数，[0, 1]
+ * @returns 插值结果
+ */
+export function _Math_Lerp(a: number, b: number, t: number): number {
+  return a + (b - a) * t;
+}
+
+/**
+ * 逆线性插值：计算 value 在 [a, b] 区间的位置比例。
+ * @param a 区间下限
+ * @param b 区间上限
+ * @param value 当前值
+ * @returns 比例 t，0 表示在 a，1 表示在 b
+ */
+export function _Math_InverseLerp(a: number, b: number, value: number): number {
+  return a === b ? 0 : (value - a) / (b - a);
+}
+
+/**
+ * 将 value 从 [fromMin, fromMax] 区间映射到 [toMin, toMax] 区间。
+ * @param value 输入值
+ * @param fromMin 源区间下限
+ * @param fromMax 源区间上限
+ * @param toMin 目标区间下限
+ * @param toMax 目标区间上限
+ * @returns 映射后的值
+ */
+export function _Math_Remap(
+  value: number,
+  fromMin: number,
+  fromMax: number,
+  toMin: number,
+  toMax: number
+): number {
+  const t = _Math_InverseLerp(fromMin, fromMax, value);
+  return _Math_Lerp(toMin, toMax, t);
+}
+
+/**
+ * 角度转弧度。
+ * @param deg 角度（度）
+ * @returns 弧度
+ */
+export function _Math_DegToRad(deg: number): number {
+  return (deg / 180) * Math.PI;
+}
+
+/**
+ * 弧度转角度。
+ * @param rad 弧度
+ * @returns 角度（度）
+ */
+export function _Math_RadToDeg(rad: number): number {
+  return (rad / Math.PI) * 180;
+}
+
+/**
+ * 将角度归一化到指定范围。
+ * @param angle 输入角度（度）
+ * @param signed 为 true 时归一化到 [-180, 180)，默认 false 归一化到 [0, 360)
+ * @returns 归一化后的角度
+ */
+export function _Math_NormalizeAngle(
+  angle: number,
+  signed = false
+): number {
+  let a = angle % 360;
+  if (a < 0) a += 360;
+  if (signed && a >= 180) a -= 360;
+  return a;
+}
+
+/**
+ * 判断点是否在矩形内（含边界）。
+ * @param px 点 X 坐标
+ * @param py 点 Y 坐标
+ * @param rx 矩形左上角 X
+ * @param ry 矩形左上角 Y
+ * @param rw 矩形宽度
+ * @param rh 矩形高度
+ * @returns true 表示点在矩形内
+ */
+export function _Math_IsPointInRect(
+  px: number,
+  py: number,
+  rx: number,
+  ry: number,
+  rw: number,
+  rh: number
+): boolean {
+  return px >= rx && px <= rx + rw && py >= ry && py <= ry + rh;
+}
+
+/**
+ * 判断点是否在圆形内（含边界）。
+ * @param px 点 X 坐标
+ * @param py 点 Y 坐标
+ * @param cx 圆心 X
+ * @param cy 圆心 Y
+ * @param radius 圆半径
+ * @returns true 表示点在圆内
+ */
+export function _Math_IsPointInCircle(
+  px: number,
+  py: number,
+  cx: number,
+  cy: number,
+  radius: number
+): boolean {
+  const dx = px - cx;
+  const dy = py - cy;
+  return dx * dx + dy * dy <= radius * radius;
 }

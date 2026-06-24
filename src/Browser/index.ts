@@ -2,7 +2,7 @@ import { PAPER_SIZE_DEFINITIONS, PaperType, WindowTarget } from "../Constant";
 import { _Utility_GenerateUUID, _Utility_WaitForCondition } from "../Utility";
 import { ChannelMessage, ChannelMessageType } from "./type";
 
-export * from "./Runtime";
+export * from "./modules";
 
 /**
  * 获取帧率
