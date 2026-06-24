@@ -1,4 +1,3 @@
-import { _Type_DeepWritable } from "../Types";
 import { _Valid_DataType } from "../Valid";
 import {
   _parsePathSegments,
@@ -327,7 +326,7 @@ export function _Utility_RotateList<T>(list: T[]) {
  * @param {any} val - 需要克隆的值
  * @returns {any} - 克隆后的值
  */
-export function _Utility_Clone<T>(val: T): _Type_DeepWritable<T> {
+export function _Utility_Clone<T>(val: T) {
   // 保存原始的structuredClone方法引用
   const oldClone = window.structuredClone;
 

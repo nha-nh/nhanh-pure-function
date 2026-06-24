@@ -42,13 +42,3 @@ export type _Type_DeepPartial<T> = {
 export type _Type_Mutable<T> = {
   -readonly [P in keyof T]: T[P];
 };
-
-/**
- * 递归地将类型中的所有只读（readonly）属性转换为可写（writable）属性
- * @template T - 要处理的基础类型
- * @description 与TypeScript内置的Writable不同，DeepWritable会对嵌套对象进行递归处理，
- *              使所有层级的属性都变为可写。适用于需要修改对象属性的场景，但需要确保对象不会被其他地方引用。
- */
-export type _Type_DeepWritable<T> = {
-  -readonly [P in keyof T]: _Type_DeepWritable<T[P]>;
-};
