@@ -1,4 +1,15 @@
 /**
+ * RGBA 颜色分量对象。
+ * r/g/b 范围 0-255，a 范围 0-1
+ */
+export interface _Utility_RGBA {
+  r: number;
+  g: number;
+  b: number;
+  a: number;
+}
+
+/**
  * 颜色转换工具。
  * 支持输入：hex/rgb/hsl/hsv，统一解析后输出指定格式。
  */
@@ -309,21 +320,31 @@ export class _Utility_ColorConverter {
   }
 
   /**
-   * 判断两个颜色是否在允许的色差范围内（基于 RGB 欧几里得距离）。
-   * @param colorA 第一个颜色字符串
-   * @param colorB 第二个颜色字符串
-   * @param threshold 允许的最大色差值，范围约 0（完全相同）到 442（黑白最大距离），含 alpha 时上限约 510
-   * @param includeAlpha 是否将 alpha 差值纳入计算，默认 true；启用时 alpha 差值会缩放到 0-255 参与距离
+   * 将颜色输入统一解析为 RGBA 对象。
+   * 字符串走 parseColor，已是对象则直接返回。
+   */
+  private static resolveColorInput(color: string | _Utility_RGBA): _Utility_RGBA {
+    if (typeof color === "string") return this.parseColor(color);
+    return color;
+  }
+
+  /**
+   * 判断两个颜色是否在允许的色差范围内（基于 RGBA 欧几里得距离）。
+   * 颜色参数支持任意颜色字符串或 { r, g, b, a } 对象。
+   * @param colorA 第一个颜色（字符串或 RGBA 对象）
+   * @param colorB 第二个颜色（字符串或 RGBA 对象）
+   * @param threshold 允许的最大色差值，范围约 0（完全相同）到 510（含 alpha 最大距离）
+   * @param includeAlpha 是否将 alpha 差值纳入计算，默认 true
    * @returns true 表示在允许色差内
    */
   static isWithinColorDifference(
-    colorA: string,
-    colorB: string,
+    colorA: string | _Utility_RGBA,
+    colorB: string | _Utility_RGBA,
     threshold: number,
     includeAlpha = true
   ): boolean {
-    const a = this.parseColor(colorA);
-    const b = this.parseColor(colorB);
+    const a = this.resolveColorInput(colorA);
+    const b = this.resolveColorInput(colorB);
     const dr = a.r - b.r;
     const dg = a.g - b.g;
     const db = a.b - b.b;
